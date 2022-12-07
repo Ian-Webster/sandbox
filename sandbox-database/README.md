@@ -6,7 +6,7 @@ A sample database for use in other sandbox applications
 
 ## Contents
 
-![alt text](.\readme-images\sandbox-database-diagram.PNG)
+![alt text](./readme-images/sandbox-database-diagram.PNG)
 
 ## Notes
 
