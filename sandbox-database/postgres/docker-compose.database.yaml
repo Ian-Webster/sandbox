@@ -1,0 +1,21 @@
+version: '3.9'
+
+volumes:
+  sandbox-database-data:
+
+services:
+  sandbox-database:
+    container_name: sandbox-database
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - sandbox-database-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sandbox-database-net
+networks:
+  sandbox-database-net:
