@@ -8,6 +8,10 @@ A sample database for use in other sandbox applications
 
 ![alt text](./readme-images/sandbox-database-diagram.PNG)
 
+## Instructions
+
+See https://github.com/Ian-Webster/sandbox/tree/main/sandbox-database/postgres for instructions on creating the Sandbox database
+
 ## Notes
 
 Database diagram created with https://app.dbdesigner.net/ 
