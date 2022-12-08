@@ -4,7 +4,7 @@ services:
   sandbox-liquibase:
     container_name: sandbox-liquibase
     image: liquibase/liquibase
-    command: --defaultsFile=liquibase.properties rollback v_1-blank-database
+    command: --defaultsFile=liquibase.properties rollback test
     volumes:
       - ./config/changelog.xml:/liquibase/changelog.xml
       - ./scripts:/liquibase/scripts
