@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DataAccess.Repository" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DataAccess.Sample.Data\DataAccess.Sample.Data.csproj" />
     <ProjectReference Include="..\DataAccess.Sample.Domain\DataAccess.Sample.Domain.csproj" />
-    <ProjectReference Include="..\DataAccess.Sample.Repositories\DataAccess.Sample.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

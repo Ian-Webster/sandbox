@@ -1,3 +1,8 @@
+using DataAccess.Repository;
+using DataAccess.Sample.Data.DatabaseContexts;
+using DataAccess.Sample.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +11,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// set up db context
+builder.Services.AddDbContext<MovieContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
+});
+
+// set up services
+builder.Services.AddScoped<RepositoryFactory<MovieContext>>();
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
 var app = builder.Build();
 
