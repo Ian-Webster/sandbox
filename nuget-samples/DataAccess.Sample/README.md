@@ -40,3 +40,47 @@ To run this project;
 	2.  https://dbeaver.io/
 	3.  https://learn.microsoft.com/en-us/sql/azure-data-studio/download-azure-data-studio?view=sql-server-ver16
 	4.  https://www.jetbrains.com/datagrip/
+
+## Example GraphQL queries;
+
+* Single select with filter:
+```json
+{
+  movie(where: {movieId: {eq: "a2f2ee47-6084-484a-969a-aec304734623"}})
+  {
+    movieId,
+    name
+  }
+}
+```
+* List with order by:
+```json
+{
+  movies (order: [{name:ASC}]),
+  {
+    movieId,
+    name
+  }
+}
+```
+* Paging with order by:
+```json
+{
+  paginatedMovies (first: 10, order: [{name:DESC}])
+  {
+    totalCount,
+    pageInfo {
+      startCursor,
+      endCursor,
+      hasNextPage,
+      hasPreviousPage
+    }
+    edges {
+      node {
+        movieId,
+        name
+      }
+    }
+  }
+}
+```

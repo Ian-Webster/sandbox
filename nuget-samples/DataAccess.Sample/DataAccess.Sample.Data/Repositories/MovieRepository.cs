@@ -1,6 +1,10 @@
 ﻿using DataAccess.Repository;
+using DataAccess.Repository.HotChocolate;
 using DataAccess.Sample.Data.DatabaseContexts;
 using DataAccess.Sample.Domain.Entities;
+using HotChocolate.Resolvers;
+using HotChocolate.Types.Pagination;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Sample.Data.Repositories;
 
@@ -18,9 +22,24 @@ public class MovieRepository: IMovieRepository
         return await _movieRepository.FirstOrDefault(m => m.MovieId == movieId, token);
     }
 
+    public async Task<Movie?> GetMovieForGraphQuery(IResolverContext context, CancellationToken token)
+    {
+        return await _movieRepository.GetQueryItem(context, token);
+    }
+
     public async Task<IEnumerable<Movie>?> GetAllMovies(CancellationToken token)
     {
         return await _movieRepository.List(m => true, token);
+    }
+
+    public async Task<IEnumerable<Movie>?> GetMoviesForGraphQuery(IResolverContext context, CancellationToken token)
+    {
+        return await _movieRepository.GetQueryItems(context, token);
+    }
+
+    public async Task<Connection<Movie>> GetMoviesPaginatedForGraphQuery(IResolverContext context, CancellationToken token)
+    {
+        return await _movieRepository.GetPagedQueryItems(context, token);
     }
 
     public async Task<bool> AddMovie(Movie movie, CancellationToken token)
