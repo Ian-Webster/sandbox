@@ -1,5 +1,6 @@
 using DataAccess.Repository;
 using DataAccess.Sample.Data.DatabaseContexts;
+using DataAccess.Sample.Data.Queries;
 using DataAccess.Sample.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,14 @@ builder.Services.AddDbContext<MovieContext>(options =>
 builder.Services.AddScoped<RepositoryFactory<MovieContext>>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
+// set up HotChocolate
+builder.Services.AddGraphQLServer()
+    .AddQueryType(q => q.Name("Query"))
+    .AddTypeExtension<MovieQuery>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,5 +45,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGraphQL();
 
 app.Run();
