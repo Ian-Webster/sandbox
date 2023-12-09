@@ -37,10 +37,20 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.InjectStylesheet("/swagger-ui/SwaggerDark.css");
+    });
 }
 
+app.UseCors(c =>
+{
+    c.WithOrigins("http://localhost:4200");
+});
+
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

@@ -17,4 +17,7 @@
     <ProjectReference Include="..\DataAccess.Sample.Data\DataAccess.Sample.Data.csproj" />
     <ProjectReference Include="..\DataAccess.Sample.Domain\DataAccess.Sample.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\swagger-ui\" />
+  </ItemGroup>
 </Project>
