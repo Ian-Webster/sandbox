@@ -27,6 +27,7 @@ builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddGraphQLServer()
     .AddQueryType(q => q.Name("Query"))
     .AddTypeExtension<MovieQuery>()
+    //.AddQueryType<Query>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

@@ -6,8 +6,8 @@ using HotChocolate.Types.Pagination;
 namespace DataAccess.Sample.Data.Queries;
 
 [ExtendObjectType("Query")]
-public class MovieQuery
-{
+public class MovieQuery //Query 
+{/*
     [UseProjection]
     [UseFiltering]
     public async Task<Movie?> GetMovie([Service] IMovieRepository repository, IResolverContext context,
@@ -15,7 +15,7 @@ public class MovieQuery
     {
         return await repository.GetMovieForGraphQuery(context, token);
     }
-
+    */
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -24,7 +24,7 @@ public class MovieQuery
     {
         return await repository.GetMoviesForGraphQuery(context, token);
     }
-
+    /*
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
@@ -33,5 +33,5 @@ public class MovieQuery
         CancellationToken token)
     {
         return await repository.GetMoviesPaginatedForGraphQuery(context, token);
-    }
+    }*/
 }
