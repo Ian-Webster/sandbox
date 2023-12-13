@@ -1,4 +1,6 @@
 import { gql } from 'apollo-angular';
+import { Injectable } from '@angular/core';
+import * as Apollo from 'apollo-angular';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -79,3 +81,28 @@ export type UuidOperationFilterInput = {
   nlt?: InputMaybe<Scalars['UUID']['input']>;
   nlte?: InputMaybe<Scalars['UUID']['input']>;
 };
+
+export type GetAllMoviesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllMoviesQuery = { __typename?: 'Query', movies?: Array<{ __typename?: 'Movie', movieId: any, name: string }> | null };
+
+export const GetAllMoviesDocument = gql`
+    query getAllMovies {
+  movies(order: [{name: ASC}]) {
+    movieId
+    name
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetAllMoviesGQL extends Apollo.Query<GetAllMoviesQuery, GetAllMoviesQueryVariables> {
+    override document = GetAllMoviesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }

@@ -15,10 +15,12 @@ export class MovieComponent implements OnInit {
 	public constructor(private movieService: MovieService) {
 	}
 
-	public async ngOnInit(): Promise<void> {
-		var movies = await this.movieService.GetMovies();
-		console.log(movies);
-		this.message = "success"
+	public ngOnInit(): void {
+		debugger;
+		this.movieService.getAllMovies().subscribe(s => {
+			debugger;
+			console.log(s);
+		});
 	}
 
 	
