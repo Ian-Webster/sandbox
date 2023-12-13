@@ -62,3 +62,38 @@ Couple of things to note here;
     Note: we have to set the `NODE_TLS_REJECT_UNAUTHORIZED` environment setting to false to fix an issue introduced in [this PR](https://github.com/dotansimha/graphql-code-generator/issues/1806) that changed the default behavior of the library to reject self-signed SSL certs (see this [comment](https://github.com/dotansimha/graphql-code-generator/issues/1785#issuecomment-493976501) for details) and because localhost .net certs are self certifcated the library will refused to communicate without the setting being set to false
 5. Run the [DataAccess.Sample.Web](https://github.com/Ian-Webster/sandbox/tree/main/nuget-samples/DataAccess.Sample/DataAccess.Sample.Web)
 6. Run the new npm command inserted in step 3 with the command `npm run generate`
+7. Next you'll need to add some configuration for Apollo in your app.config.ts, before doing this run `ng add apollo-angular` (see https://the-guild.dev/graphql/apollo-angular/docs/get-started) this should scaffold most the setup for you, your file should look something like this;
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideClientHydration } from '@angular/platform-browser';
+import { APOLLO_OPTIONS } from 'apollo-angular';
+import { InMemoryCache } from '@apollo/client';
+import { HttpLink } from 'apollo-angular/http';
+
+export const appConfig: ApplicationConfig = {
+	providers: [
+		provideHttpClient(withFetch()), 
+		provideRouter(routes), 
+		provideClientHydration(),
+		{
+			provide: APOLLO_OPTIONS,
+			useFactory(httpLink: HttpLink) {
+			  return {
+				cache: new InMemoryCache(),
+				link: httpLink.create({
+				  uri: 'https://localhost:7128/graphql/',
+				}),
+			  };
+			},
+			deps: [HttpLink],
+		  },
+	] 
+};
+
+```
+Make sure `uri` is set to your graphql endpoint
+8. 
