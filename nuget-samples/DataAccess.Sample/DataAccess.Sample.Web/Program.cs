@@ -44,10 +44,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors(c =>
-{
-    c.WithOrigins("http://localhost:4200");
-});
+
 
 app.UseHttpsRedirection();
 
@@ -58,5 +55,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGraphQL();
+
+app.UseCors(c =>
+{
+    c.WithOrigins("http://localhost:4200");
+    c.AllowAnyHeader();
+});
 
 app.Run();

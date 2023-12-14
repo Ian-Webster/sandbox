@@ -1,7 +1,0 @@
-query getAllMovies{
-  movies (order: [{name:ASC}]),
-  {
-    movieId,
-    name
-  }
-}
