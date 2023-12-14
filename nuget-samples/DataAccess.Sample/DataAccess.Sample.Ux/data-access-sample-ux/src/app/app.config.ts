@@ -12,7 +12,6 @@ export const appConfig: ApplicationConfig = {
 	providers: [
 		provideHttpClient(withFetch()), 
 		provideRouter(routes), 
-		provideClientHydration(),
 		{
 			provide: APOLLO_OPTIONS,
 			useFactory(httpLink: HttpLink) {
@@ -23,7 +22,7 @@ export const appConfig: ApplicationConfig = {
 				}),
 			  };
 			},
-			deps: [HttpLink],
-		  },
+			deps: [HttpLink]
+		}
 	] 
 };
