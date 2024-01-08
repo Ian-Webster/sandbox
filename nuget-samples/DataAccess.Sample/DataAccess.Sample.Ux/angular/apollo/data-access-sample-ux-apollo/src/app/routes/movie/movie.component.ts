@@ -17,7 +17,7 @@ export class MovieComponent implements OnInit {
 
 	public ngOnInit(): void {
 
-		this.movieService.test();
+		//this.movieService.test();
 
 		this.movieService.movies.subscribe(movie => {
 			console.log(movie);
@@ -25,6 +25,10 @@ export class MovieComponent implements OnInit {
 
 		this.movieService.GetMovies().then(m => {
 			console.log(m);
+		});
+
+		this.movieService.getAllMovies().subscribe(m => {
+			console.log(m);		
 		});
 
 		// this.movieService.getAllMovies().subscribe(s => {

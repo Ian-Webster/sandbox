@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnInit } from "@angular/core";
+import { ApolloQueryResult } from "@apollo/client/core";
 import { Apollo, gql } from "apollo-angular";
 import { BehaviorSubject, Observable, lastValueFrom, map } from "rxjs";
 
@@ -12,23 +13,6 @@ export class MovieService implements OnInit {
 	}
 
 	ngOnInit(): void {
-		debugger;
-		this.apollo
-		.watchQuery({
-			query: gql`
-			query getAllMovies{
-				movies (order: [{name:ASC}]),
-				{
-				  movieId,
-				  name
-				}
-			  }
-			`,
-		})
-		.valueChanges.subscribe((result: any) => {
-			debugger;
-			this.movies.next(result);
-		});
 	}
 
     public async GetMovies(): Promise<any> {
@@ -41,30 +25,37 @@ export class MovieService implements OnInit {
 		}
 	}
 
-	// TODO - try this https://www.apollographql.com/docs/apollo-server/workflow/generate-types/ tomorrow if no anwsers on your question here https://github.com/dotansimha/graphql-code-generator/discussions/9785
-
-	public getAllMovies(): Observable<any> | undefined {
-		return undefined;
-	}
-
-	public test(): void {
-		debugger;
-		this.apollo
-		.watchQuery({
+	public getAllMovies(): Observable<ApolloQueryResult<any>> {
+		return this.apollo.watchQuery<any>({
 			query: gql`
-			query getAllMovies{
-				movies (order: [{name:ASC}]),
-				{
-				  movieId,
-				  name
+				query getAllMovies {
+					movies {
+						movieId
+						name
+					}
 				}
-			  }
 			`,
-		})
-		.valueChanges.subscribe((result: any) => {
-			debugger;
-			this.movies.next(result);
-		});
+		}).valueChanges;
 	}
+
+
+		// debugger;
+		// this.apollo
+		// .watchQuery({
+		// 	query: gql`
+		// 	query getAllMovies{
+		// 		movies (order: [{name:ASC}]),
+		// 		{
+		// 		  movieId,
+		// 		  name
+		// 		}
+		// 	  }
+		// 	`,
+		// })
+		// .valueChanges.subscribe((result: any) => {
+		// 	debugger;
+		// 	this.movies.next(result);
+		// });
+//	}
 
 }

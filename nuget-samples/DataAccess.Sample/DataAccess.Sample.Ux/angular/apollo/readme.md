@@ -118,4 +118,6 @@ class MovieService {
 }
 ```
 
+https://the-guild.dev/graphql/apollo-angular/docs/data/queries
+
 https://the-guild.dev/graphql/apollo-angular/docs/development-and-testing/using-typescript
