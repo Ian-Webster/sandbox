@@ -7,7 +7,7 @@ namespace DataAccess.Sample.Data.Queries;
 
 [ExtendObjectType("Query")]
 public class MovieQuery //Query 
-{/*
+{
     [UseProjection]
     [UseFiltering]
     public async Task<Movie?> GetMovie([Service] IMovieRepository repository, IResolverContext context,
@@ -15,7 +15,7 @@ public class MovieQuery //Query
     {
         return await repository.GetMovieForGraphQuery(context, token);
     }
-    */
+    
     [UseProjection]
     [UseFiltering]
     [UseSorting]

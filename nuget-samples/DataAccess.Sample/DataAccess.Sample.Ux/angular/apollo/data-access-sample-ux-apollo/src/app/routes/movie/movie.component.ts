@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MovieService } from '../../services/movie/movie.service';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
 	selector: 'app-movie',
@@ -27,8 +28,10 @@ export class MovieComponent implements OnInit {
 			console.log(m);
 		});
 
-		this.movieService.getAllMovies().subscribe(m => {
-			console.log(m);		
+		this.movieService.getAllMovies().subscribe(({ data, loading }) =>{
+			if (!loading) {
+				console.log(data.movies);
+			}
 		});
 
 		// this.movieService.getAllMovies().subscribe(s => {

@@ -1,0 +1,20 @@
+<h1>Movies</h1>
+<div *ngIf="loading">
+	Please wait loading;
+</div>
+<div *ngIf="!loading">
+	<table>
+		<thead>
+		<tr>
+			<th>Movie ID</th>
+			<th>Name</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr *ngFor="let movie of movies">
+			<td>{{ movie.movieId }}</td>
+			<td>{{ movie.name }}</td>
+		</tr>
+		</tbody>
+  </table>
+</div>	
