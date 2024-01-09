@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MovieService } from '../../../services/movie/movie.service';
-import { SharedModule } from '../../../shared/shared.module';
+import { MovieService } from '../../services/movie/movie.service';
+import { SharedModule } from '../../shared/shared.module';
 import { RouterLink } from '@angular/router';
 
 @Component({

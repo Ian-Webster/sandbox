@@ -1,0 +1,22 @@
+<h1>Paginated Movies</h1>
+
+<div *ngIf="loading; else notLoading">
+	<p>Loading...</p>
+  </div>
+
+<ng-template #notLoading>
+  <div>
+    <ul>
+      <li *ngFor="let movie of movies.edges">
+        <p>Movie ID: {{movie.node.movieId}}</p>
+        <p>Name: {{movie.node.name}}</p>
+      </li>
+    </ul>
+
+    <nav>
+	  <span>{{movies.totalCount}} movies</span>
+      <button (click)="getPreviousPage()" [disabled]="!movies.pageInfo.hasPreviousPage">Previous</button>
+      <button (click)="getNextPage()" [disabled]="!movies.pageInfo.hasNextPage">Next</button>
+    </nav>
+  </div>
+</ng-template>

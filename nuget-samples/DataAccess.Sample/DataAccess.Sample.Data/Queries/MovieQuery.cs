@@ -24,7 +24,7 @@ public class MovieQuery //Query
     {
         return await repository.GetMoviesForGraphQuery(context, token);
     }
-    /*
+    
     [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
@@ -33,5 +33,5 @@ public class MovieQuery //Query
         CancellationToken token)
     {
         return await repository.GetMoviesPaginatedForGraphQuery(context, token);
-    }*/
+    }
 }
