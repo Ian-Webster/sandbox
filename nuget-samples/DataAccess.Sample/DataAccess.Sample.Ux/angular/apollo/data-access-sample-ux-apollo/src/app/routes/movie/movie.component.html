@@ -1,3 +1,12 @@
-<div>
-	<button></button>
+<div *ngIf="loading">
+	Please wait loading.
+</div>
+<div *ngIf="!loading && movie">
+	<h2>Movie Details</h2>
+	<p><strong>ID:</strong> {{ movie.movieId }}</p>
+	<p><strong>Name:</strong> {{ movie.name }}</p>
+	<p><strong>Genre:</strong> {{ genre }}</p>
+</div>
+<div *ngIf="!loading && !movie">
+	Movie not found.
 </div>

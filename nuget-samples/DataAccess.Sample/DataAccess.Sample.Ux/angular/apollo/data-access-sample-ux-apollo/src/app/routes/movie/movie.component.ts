@@ -1,43 +1,40 @@
 import { Component, OnInit } from '@angular/core';
 import { MovieService } from '../../services/movie/movie.service';
 import { SharedModule } from '../../shared/shared.module';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
 	selector: 'app-movie',
 	standalone: true,
-	imports: [],
+	imports: [SharedModule],
 	templateUrl: './movie.component.html',
 	styleUrl: './movie.component.scss'
 })
 export class MovieComponent implements OnInit {
 
-	public message: string = "";
+	public loading: boolean = true;
+	public movie: any = null;
+	public genre: string = '';
 
-	public constructor(private movieService: MovieService) {
+	private movieId: string|null = '';
+
+	public constructor(private movieService: MovieService, private route: ActivatedRoute) {
+		this.movieId = this.route.snapshot.paramMap.get('id');
 	}
 
 	public ngOnInit(): void {
 
-		//this.movieService.test();
+		if (!this.movieId) {
+			this.loading = false;
+			return;
+		}
 
-		this.movieService.movies.subscribe(movie => {
-			console.log(movie);
+		this.movieService.getMovieById(this.movieId).subscribe(result => {
+			this.movie = result.data.movie;
+			this.genre = this.movie.movieGenres.map((x: any) => x.genre);
+			this.loading = result.loading;
 		});
 
-		this.movieService.GetMovies().then(m => {
-			console.log(m);
-		});
-
-		this.movieService.getAllMovies().subscribe(({ data, loading }) =>{
-			if (!loading) {
-				console.log(data.movies);
-			}
-		});
-
-		// this.movieService.getAllMovies().subscribe(s => {
-		// 	debugger;
-		// 	console.log(s);
-		// });
 	}
 
 	

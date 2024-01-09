@@ -11,6 +11,10 @@ public class MovieEntityTypeConfiguration: IEntityTypeConfiguration<Movie>
     {
         builder.HasKey(pk => pk.MovieId);
 
+        builder.HasMany(m => m.MovieGenres)
+            .WithOne(mg => mg.Movie)
+            .HasForeignKey(mg => mg.MovieId);
+
         builder.ToTable(nameof(Movie), SchemaNames.Public);
     }
 }

@@ -8,13 +8,15 @@
 		<tr>
 			<th>Movie ID</th>
 			<th>Name</th>
+			<th></th>
 		</tr>
 		</thead>
 		<tbody>
 		<tr *ngFor="let movie of movies">
 			<td>{{ movie.movieId }}</td>
 			<td>{{ movie.name }}</td>
+			<td><a [routerLink]="['/movie', movie.movieId]">View</a></td>
 		</tr>
 		</tbody>
   </table>
-</div>	
+</div>

@@ -38,6 +38,25 @@ export class MovieService implements OnInit {
 		}).valueChanges;
 	}
 
+	public getMovieById(movieId: string): Observable<ApolloQueryResult<any>> {
+		return this.apollo.watchQuery<any>({
+			query: gql`
+				query getMovieById($id: UUID!) {
+					movie(where: {movieId: {eq: $id}}) {
+						movieId
+						name,
+						movieGenres { 
+							genre 
+						}
+					}
+				}
+			`,
+			variables: {
+				id: movieId,
+			},
+		}).valueChanges;
+	}
+
 
 		// debugger;
 		// this.apollo

@@ -17,7 +17,6 @@
     <ProjectReference Include="..\DataAccess.Sample.Domain\DataAccess.Sample.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="EntityTypeConfigurations\" />
     <Folder Include="DatabaseContexts\" />
     <Folder Include="Queries\" />
     <Folder Include="Repositories\" />

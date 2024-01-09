@@ -7,6 +7,6 @@ export const routes: Routes = [
 		path: 'movies', component: MoviesComponent
 	},
 	{
-		path: 'movie', component: MovieComponent
+		path: 'movie/:id', component: MovieComponent
 	}
 ];
