@@ -1,0 +1,23 @@
+.nav {
+	display: flex;
+	justify-content: space-between; /* Add this line */
+	align-items: center; /* Add this line if you want to center items vertically */
+	background-color: #424242;
+	padding: 10px 0px 10px 10px;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	z-index: 1000;
+
+	.site-name {
+		//justify-content: center;
+		font-weight: 700;
+		size: 2em;
+	}
+
+	.nav-container {
+		//justify-content: flex-end;
+		padding-right: 25px;
+	}
+
+}
