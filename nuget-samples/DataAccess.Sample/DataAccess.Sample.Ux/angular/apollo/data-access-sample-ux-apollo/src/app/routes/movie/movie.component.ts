@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MovieService } from '../../services/movie/movie.service';
 import { SharedModule } from '../../shared/shared.module';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
 	selector: 'app-movie',
 	standalone: true,
-	imports: [SharedModule],
+	imports: [SharedModule, MatCardModule],
 	templateUrl: './movie.component.html',
 	styleUrl: './movie.component.scss'
 })

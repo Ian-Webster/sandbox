@@ -6,21 +6,21 @@ import { BehaviorSubject, Observable, lastValueFrom, map } from "rxjs";
 import { SortEnumType } from "../../domain/enums/sort.enum";
 import { parse } from "graphql";
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class MovieService implements OnInit {
 
 	public movies: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-	public constructor(private httpClient: HttpClient, private apollo: Apollo) {	
+	public constructor(private httpClient: HttpClient, private apollo: Apollo) {
 	}
 
 	ngOnInit(): void {
 	}
 
-    public async GetMovies(): Promise<any> {
-		try { 
+	public async GetMovies(): Promise<any> {
+		try {
 			return await lastValueFrom(this.httpClient.get("https://localhost:7128/api/Movie"));
-		} 
+		}
 		catch (ex) {
 			console.log(ex);
 			return "error";
@@ -59,32 +59,72 @@ export class MovieService implements OnInit {
 		}).valueChanges;
 	}
 
-	public getPaginatedMovies(first: number, after: string): Observable<ApolloQueryResult<any>> {
-		return this.apollo.watchQuery<any>({
-			query: gql`
-				query getPaginatedMovies($first: Int!, $after: String!) {
-					paginatedMovies(first: $first, order: [{name: DESC}], after: $after) {
-						totalCount
-						pageInfo {
-							startCursor
-							endCursor
-							hasNextPage
-							hasPreviousPage
-						}
-						edges {
-							node {
-								movieId
-								name
-							}
-						}
-					}
+	/**
+	 * Get movies paginated using cursor pagination
+	 * @param first 
+	 * @param after 
+	 * @returns 
+	 */
+	public getCursorPaginatedMovies(take: number, forward: boolean, after?: string | undefined): Observable<ApolloQueryResult<any>> {
+		// TODO: this isn't working - when you go backwards you go to the first page
+		// TODO: this needs work there must be a better way of paging
+		// TODO: offset paging + angular pagniator
+		let queryString = `
+		  query getPaginatedMovies($first: Int!`;
+
+		if (after) {
+			queryString += `, $after: String) {
+				paginatedMovies(first: $first, order: [{name: ASC}], ${forward? 'after' : 'before'}: $after`;
+		} else {
+			queryString += `) {
+				paginatedMovies(first: $first, order: [{name: ASC}]`;
+		}
+
+		queryString += `) {
+			totalCount
+			pageInfo {
+				startCursor
+				endCursor
+				hasNextPage
+				hasPreviousPage
+			}
+			edges {
+				node {
+				movieId
+				name
 				}
-			`,
+			}
+			}
+		}`;
+
+		console.log(queryString);
+		console.log(after);
+
+		if(after) {
+			if (forward) {
+				return this.apollo.watchQuery<any>({
+					query: gql`${queryString}`,
+					variables: {
+						first: take,
+						after: after
+					}
+				}).valueChanges;
+			} else {
+				return this.apollo.watchQuery<any>({
+					query: gql`${queryString}`,
+					variables: {
+						first: take,
+						before: after
+					}
+				}).valueChanges;
+			}
+		}
+
+		return this.apollo.watchQuery<any>({
+			query: gql`${queryString}`,
 			variables: {
-				first: first,
-				after: after,
-			},
+				first: take
+			}
 		}).valueChanges;
 	}
-
 }
