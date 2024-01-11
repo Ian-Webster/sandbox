@@ -10,14 +10,15 @@
 	z-index: 1000;
 
 	.site-name {
-		//justify-content: center;
 		font-weight: 700;
-		size: 2em;
+		font-family: 'Tektur', sans-serif;
 	}
 
 	.nav-container {
-		//justify-content: flex-end;
 		padding-right: 25px;
 	}
-
 }
+
+fa-icon {
+	padding-right: 10px; /* Adjust as needed */
+  }

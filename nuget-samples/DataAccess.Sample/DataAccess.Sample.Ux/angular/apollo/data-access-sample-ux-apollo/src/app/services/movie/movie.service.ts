@@ -31,7 +31,7 @@ export class MovieService implements OnInit {
 		return this.apollo.watchQuery<any>({
 			query: gql`
 				query getAllMovies {
-					movies {
+					movies (order: [{name:ASC}]) {
 						movieId
 						name
 					}

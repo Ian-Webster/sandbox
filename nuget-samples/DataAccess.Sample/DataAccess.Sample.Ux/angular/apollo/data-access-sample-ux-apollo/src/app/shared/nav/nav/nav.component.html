@@ -3,10 +3,14 @@
 		DataAccess Sandbox
 	</div>
 	<div class="nav-container">
-		<button mat-button [matMenuTriggerFor]="menu">Menu</button>
-		<mat-menu #menu="matMenu">
-		  <button mat-menu-item>Item 1</button>
-		  <button mat-menu-item>Item 2</button>
+		<button mat-button [matMenuTriggerFor]="main_menu">Menu</button>
+		<mat-menu #main_menu="matMenu">
+			<button mat-menu-item [matMenuTriggerFor]="films"><fa-icon [icon]="faFilm"></fa-icon> Films</button>
+		</mat-menu>
+
+		<mat-menu #films="matMenu">
+			<button mat-menu-item [routerLink]="['/movies']">All films</button>
+			<button mat-menu-item [routerLink]="['/movies-paged']">Paginated films</button>
 		</mat-menu>
 	</div>
 </div>
