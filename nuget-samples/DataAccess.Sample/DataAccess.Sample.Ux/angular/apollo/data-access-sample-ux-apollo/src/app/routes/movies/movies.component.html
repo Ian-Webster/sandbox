@@ -22,7 +22,9 @@
 			<!-- View Column -->
 			<ng-container matColumnDef="view">
 				<th mat-header-cell *matHeaderCellDef></th>
-				<td mat-cell *matCellDef="let movie"><a [routerLink]="['/movie', movie.movieId]"><fa-icon [icon]="faEye"></fa-icon></a></td>
+				<td mat-cell *matCellDef="let movie">
+					<a [routerLink]="['/movie', movie.movieId]"><fa-icon [icon]="faEye"></fa-icon></a>
+				</td>
 			</ng-container>
 	
 			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { MovieService } from '../../services/movie/movie.service';
 import { MatTableModule } from '@angular/material/table';
@@ -6,7 +7,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { faArrowCircleLeft, faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleLeft, faArrowCircleRight, faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CursorPage } from '../../domain/models/paging/cusor-page';
 
@@ -20,7 +21,8 @@ import { CursorPage } from '../../domain/models/paging/cusor-page';
 		FontAwesomeModule,
 		MatInputModule,
 		MatSelectModule,
-		MatFormFieldModule],
+		MatFormFieldModule,
+		RouterLink],
 	templateUrl: './movies-paginated.component.html',
 	styleUrl: './movies-paginated.component.scss'
 })
@@ -29,10 +31,11 @@ export class MoviesPaginatedComponent implements OnInit {
 	displayedColumns: string[] = ['movieId', 'name', 'view'];
 	faArrowCircleLeft = faArrowCircleLeft;
 	faArrowCircleRight = faArrowCircleRight;
+	faEye = faEye;
 
 	public movies: any;
 	public loading: boolean = true;
-	public pageSize: number = 2;
+	public pageSize: number = 5;
 	public defaultPageSize = 5;
 	public pageSizes = [5, 10, 25];
 
