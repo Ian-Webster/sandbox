@@ -65,7 +65,7 @@ export class MovieService implements OnInit {
 	 * @param after 
 	 * @returns 
 	 */
-	public getCursorPaginatedMovies(take: number, forward: boolean, after?: string | undefined): Observable<ApolloQueryResult<any>> {
+	public getCursorPaginatedMovies(take: number, after?: string | undefined): Observable<ApolloQueryResult<any>> {
 		// TODO: this isn't working - when you go backwards you go to the first page
 		// TODO: this needs work there must be a better way of paging
 		// TODO: offset paging + angular pagniator
@@ -74,7 +74,7 @@ export class MovieService implements OnInit {
 
 		if (after) {
 			queryString += `, $after: String) {
-				paginatedMovies(first: $first, order: [{name: ASC}], ${forward? 'after' : 'before'}: $after`;
+				paginatedMovies(first: $first, order: [{name: ASC}], after: $after`;
 		} else {
 			queryString += `) {
 				paginatedMovies(first: $first, order: [{name: ASC}]`;
@@ -100,24 +100,14 @@ export class MovieService implements OnInit {
 		console.log(queryString);
 		console.log(after);
 
-		if(after) {
-			if (forward) {
-				return this.apollo.watchQuery<any>({
-					query: gql`${queryString}`,
-					variables: {
-						first: take,
-						after: after
-					}
-				}).valueChanges;
-			} else {
-				return this.apollo.watchQuery<any>({
-					query: gql`${queryString}`,
-					variables: {
-						first: take,
-						before: after
-					}
-				}).valueChanges;
-			}
+		if (after) {
+			return this.apollo.watchQuery<any>({
+				query: gql`${queryString}`,
+				variables: {
+					first: take,
+					after: after
+				}
+			}).valueChanges;
 		}
 
 		return this.apollo.watchQuery<any>({

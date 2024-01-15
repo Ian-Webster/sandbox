@@ -1,42 +1,51 @@
 <h1>Paginated Movies</h1>
 
 <div *ngIf="loading; else notLoading">
-  <p>Loading...</p>
+	<p>Loading...</p>
 </div>
 
 <ng-template #notLoading>
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="movies.edges" class="full-width-table">
+	<div class="mat-elevation-z8">
+		<table mat-table [dataSource]="movies.edges" class="full-width-table">
 
-      <!-- Movie ID Column -->
-      <ng-container matColumnDef="movieId">
-        <th mat-header-cell *matHeaderCellDef>Movie ID</th>
-        <td mat-cell *matCellDef="let movie">{{ movie.node.movieId }}</td>
-      </ng-container>
+			<!-- Movie ID Column -->
+			<ng-container matColumnDef="movieId">
+				<th mat-header-cell *matHeaderCellDef>Movie ID</th>
+				<td mat-cell *matCellDef="let movie">{{ movie.node.movieId }}</td>
+			</ng-container>
 
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let movie">{{ movie.node.name }}</td>
-      </ng-container>
+			<!-- Name Column -->
+			<ng-container matColumnDef="name">
+				<th mat-header-cell *matHeaderCellDef>Name</th>
+				<td mat-cell *matCellDef="let movie">{{ movie.node.name }}</td>
+			</ng-container>
 
-      <!-- View Column -->
-      <ng-container matColumnDef="view">
-        <th mat-header-cell *matHeaderCellDef>View</th>
-        <td mat-cell *matCellDef="let movie">View</td>
-      </ng-container>
+			<!-- View Column -->
+			<ng-container matColumnDef="view">
+				<th mat-header-cell *matHeaderCellDef>View</th>
+				<td mat-cell *matCellDef="let movie">View</td>
+			</ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+		</table>
 
-	<div class="paging-container">
-		<button mat-icon-button (click)="getPreviousPage()" [disabled]="!movies.pageInfo.hasPreviousPage">
-			<fa-icon [icon]="faArrowCircleLeft"></fa-icon>
-		</button>
-		<button mat-icon-button (click)="getNextPage()" [disabled]="!movies.pageInfo.hasNextPage">
-			<fa-icon [icon]="faArrowCircleRight"></fa-icon>
-		</button>
-	  </div>
-  </div>
+		<div class="paging-container">
+			<div class="page-size">
+				<mat-form-field>
+					<mat-select (selectionChange)="onPageSizeChange($event)" [value]="defaultPageSize">
+						<mat-option *ngFor="let size of pageSizes" [value]="size">{{size}}</mat-option>
+					</mat-select>
+				  </mat-form-field>
+			</div>
+			<div class="page-buttons">
+				<button mat-icon-button (click)="getPreviousPage()" [disabled]="!movies.pageInfo.hasPreviousPage">
+					<fa-icon [icon]="faArrowCircleLeft"></fa-icon>
+				</button>
+				<button mat-icon-button (click)="getNextPage()" [disabled]="!movies.pageInfo.hasNextPage">
+					<fa-icon [icon]="faArrowCircleRight"></fa-icon>
+				</button>
+			</div>
+		</div>
+	</div>
 </ng-template>

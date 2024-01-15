@@ -1,8 +1,39 @@
 .paging-container {
 	padding: 10px;
+	display: flex;
+    justify-content: space-between;
+	align-items: center;
 
 	fa-icon{
 		cursor: pointer;
 	}
+
+    .page-size {
+        margin: 0; /* Reset margin */
+        padding: 0; /* Reset padding */
+
+		mat-form-field {
+			width: 80px;
+		}
+    }
+    
+    .page-buttons {
+        margin: 0 0 0 0.5em; /* Adjust top margin */
+        padding: 0; /* Reset padding */
+        button {
+			line-height: 1; /* Align text vertically in the middle */
+            padding: 10px 20px; /* Increase button size by increasing padding */
+            font-size: 26px;
+			background: transparent; /* Make the button background transparent */
+            border: none; /* Remove the button border */
+            padding: 0; /* Remove the button padding */
+
+			&:not(:disabled) {
+				fa-icon {
+					color: white; /* Set the color to white when the button is active */
+				}
+			}
+        }
+    }
 }
 
