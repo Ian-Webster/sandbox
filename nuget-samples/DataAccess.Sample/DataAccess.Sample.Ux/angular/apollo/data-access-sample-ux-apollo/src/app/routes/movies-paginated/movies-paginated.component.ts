@@ -36,8 +36,7 @@ export class MoviesPaginatedComponent implements OnInit {
 	public movies: any;
 	public loading: boolean = true;
 	public pageSize: number = 5;
-	public defaultPageSize = 5;
-	public pageSizes = [5, 10, 25];
+	public pageSizes: Array<number> = [5, 10, 25];
 
 	private pages: Array<CursorPage> = new Array<CursorPage>();
 	private pageIndex: number = 0;
@@ -63,7 +62,7 @@ export class MoviesPaginatedComponent implements OnInit {
 		this.ngOnInit();
 	}
 
-	getNextPage() {
+	public getNextPage() {
 		if (!this.movies || !this.movies.pageInfo || !this.movies.pageInfo.hasNextPage) { return; }
 		this.loading = true;
 		const currentNextCursor = this.movies.pageInfo.endCursor;
@@ -77,7 +76,7 @@ export class MoviesPaginatedComponent implements OnInit {
 		});
 	}
 
-	getPreviousPage() {
+	public getPreviousPage() {
 		if (!this.movies && !this.movies.pageInfo.hasPreviousPage) { return; }
 		this.loading = true;
 		this.pageIndex--;
@@ -90,7 +89,6 @@ export class MoviesPaginatedComponent implements OnInit {
 	}
 
 	pageEvent($event: PageEvent) {
-		console.log($event);
 		if (this.movies) {
 			this.loading = true;
 			const cursor = $event.previousPageIndex == null ? null : $event.previousPageIndex < $event.pageIndex ? this.movies.pageInfo.endCursor : this.movies.pageInfo.startCursor;

@@ -22,7 +22,6 @@ export class MovieService implements OnInit {
 			return await lastValueFrom(this.httpClient.get("https://localhost:7128/api/Movie"));
 		}
 		catch (ex) {
-			console.log(ex);
 			return "error";
 		}
 	}
@@ -96,9 +95,6 @@ export class MovieService implements OnInit {
 			}
 			}
 		}`;
-
-		console.log(queryString);
-		console.log(after);
 
 		if (after) {
 			return this.apollo.watchQuery<any>({
