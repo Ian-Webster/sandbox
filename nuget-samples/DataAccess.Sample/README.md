@@ -84,3 +84,20 @@ To run this project;
   }
 }
 ```
+* Paging with offset
+```json
+{
+  offsetPaginatedMovies(take: 10, skip: 20, order: [{name:ASC}])
+  {
+    totalCount,
+    pageInfo {
+      hasNextPage,
+      hasPreviousPage
+    }
+    items {
+      movieId,
+      name
+    }
+  }
+}
+```

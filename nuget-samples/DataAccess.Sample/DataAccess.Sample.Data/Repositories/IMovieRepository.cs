@@ -16,6 +16,8 @@ public interface IMovieRepository
 
     Task<Connection<Movie>> GetMoviesPaginatedForGraphQuery(IResolverContext context, CancellationToken token);
 
+    Task<CollectionSegment<Movie>?> GetMoviesOffsetPaginatedForGraphpQuery(IResolverContext context, CancellationToken token);
+
     Task<bool> AddMovie(Movie movie, CancellationToken token);
 
     Task<bool> UpdateMovie(Movie movie, CancellationToken token);

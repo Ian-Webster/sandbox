@@ -34,4 +34,14 @@ public class MovieQuery //Query
     {
         return await repository.GetMoviesPaginatedForGraphQuery(context, token);
     }
+
+    [UseOffsetPaging(IncludeTotalCount = true)]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public async Task<CollectionSegment<Movie>?> GetOffsetPaginatedMovies([Service] IMovieRepository repository, IResolverContext context,
+               CancellationToken token)
+    {
+        return await repository.GetMoviesOffsetPaginatedForGraphpQuery(context, token);
+    }
 }
