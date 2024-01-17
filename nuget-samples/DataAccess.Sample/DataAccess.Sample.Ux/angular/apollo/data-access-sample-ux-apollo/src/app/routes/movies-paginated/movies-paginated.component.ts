@@ -88,17 +88,4 @@ export class MoviesPaginatedComponent implements OnInit {
 		});
 	}
 
-	pageEvent($event: PageEvent) {
-		if (this.movies) {
-			this.loading = true;
-			const cursor = $event.previousPageIndex == null ? null : $event.previousPageIndex < $event.pageIndex ? this.movies.pageInfo.endCursor : this.movies.pageInfo.startCursor;
-			this.movieService.getCursorPaginatedMovies($event.pageSize, cursor).subscribe(({ data, loading }) => {
-				if (!loading) {
-					this.movies = data.paginatedMovies;
-					this.loading = false;
-				}
-			});
-		}
-	}
-
 }

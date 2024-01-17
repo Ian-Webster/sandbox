@@ -5,17 +5,17 @@ import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 
 const uri = 'https://localhost:7128/graphql/'; // <-- add the URL of the GraphQL server here
 export function apolloOptionsFactory(): ApolloClientOptions<any> {
-  const httpLink = inject(HttpLink);
-  return {
-    link: httpLink.create({ uri }),
-    cache: new InMemoryCache(),
-  };
+	const httpLink = inject(HttpLink);
+	return {
+		link: httpLink.create({ uri }),
+		cache: new InMemoryCache(),
+	};
 }
 
 export const graphqlProvider: ApplicationConfig['providers'] = [
-  Apollo,
-  {
-    provide: APOLLO_OPTIONS,
-    useFactory: apolloOptionsFactory,
-  },
+	Apollo,
+	{
+		provide: APOLLO_OPTIONS,
+		useFactory: apolloOptionsFactory,
+	},
 ];

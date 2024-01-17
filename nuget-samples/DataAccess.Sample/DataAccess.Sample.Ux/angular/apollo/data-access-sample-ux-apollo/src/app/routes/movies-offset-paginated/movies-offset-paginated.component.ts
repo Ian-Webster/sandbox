@@ -65,5 +65,4 @@ export class MoviesOffsetPaginatedComponent implements OnInit {
 			}
 		});
 	}
-
 }

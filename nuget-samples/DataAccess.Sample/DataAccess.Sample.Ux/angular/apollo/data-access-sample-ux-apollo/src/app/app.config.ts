@@ -8,10 +8,10 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
-    provideHttpClient(withFetch()),
-    provideRouter(routes),
-    provideHttpClient(),
-    graphqlProvider,
-    provideAnimations()
-] 
+		provideHttpClient(withFetch()),
+		provideRouter(routes),
+		provideHttpClient(),
+		graphqlProvider,
+		provideAnimations()
+	]
 };
