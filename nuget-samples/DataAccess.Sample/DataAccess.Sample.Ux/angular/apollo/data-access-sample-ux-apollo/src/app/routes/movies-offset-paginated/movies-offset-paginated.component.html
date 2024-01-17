@@ -31,9 +31,7 @@
 			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 		</table>
-			<!-- [length]="numberOfRecords" 
-			[pageSize]="pageSize" 
-			[pageSizeOptions]="pageSizes" -->
+		
 		<mat-paginator 
 			[length]="numberOfRecords" 
 			[pageSizeOptions]="pageSizes"

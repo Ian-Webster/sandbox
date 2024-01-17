@@ -5,11 +5,10 @@ import { MovieService } from '../../services/movie/movie.service';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { faArrowCircleLeft, faArrowCircleRight, faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CursorPage } from '../../domain/models/paging/cusor-page';
 
 @Component({
 	selector: 'app-movies-offset-paginated',
