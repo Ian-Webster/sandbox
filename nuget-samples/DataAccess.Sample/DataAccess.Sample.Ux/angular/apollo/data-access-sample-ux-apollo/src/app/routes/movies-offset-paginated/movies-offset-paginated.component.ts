@@ -37,68 +37,34 @@ export class MoviesOffsetPaginatedComponent implements OnInit {
 	public loading: boolean = true;
 	public pageSize: number = 5;
 	public pageSizes: Array<number> = [5, 10, 25];
-
-	private pages: Array<CursorPage> = new Array<CursorPage>();
-	private pageIndex: number = 0;
-
+	public numberOfRecords: number = 0;
+	public pageIndex: number = 0;
+	
 	constructor(private movieService: MovieService) {
 
 	}
 
-	ngOnInit(): void {
-		this.pages = new Array<CursorPage>();
-		this.pageIndex = 0;
-		this.movieService.getCursorPaginatedMovies(this.pageSize).subscribe(({ data, loading }) => {
-			if (!loading) {
-				this.movies = data.paginatedMovies;
-				this.pages.push({ index: 0, cursor: undefined }); // first page has no cursor so push undefined
-				this.loading = false;
-			}
-		});
+	public ngOnInit(): void {
+		this.getMovies(this.pageSize, 0);
 	}
 
-	public onPageSizeChange($event: MatSelectChange) {
-		this.pageSize = $event.value;
-		this.ngOnInit();
-	}
-
-	public getNextPage() {
-		if (!this.movies || !this.movies.pageInfo || !this.movies.pageInfo.hasNextPage) { return; }
-		this.loading = true;
-		const currentNextCursor = this.movies.pageInfo.endCursor;
-		this.movieService.getCursorPaginatedMovies(this.pageSize, this.movies.pageInfo.endCursor).subscribe(({ data, loading }) => {
-			if (!loading) {
-				this.movies = data.paginatedMovies;
-				this.pageIndex++;
-				this.pages.push({ index: this.pageIndex, cursor: currentNextCursor });
-				this.loading = false;
-			}
-		});
-	}
-
-	public getPreviousPage() {
-		if (!this.movies && !this.movies.pageInfo.hasPreviousPage) { return; }
-		this.loading = true;
-		this.pageIndex--;
-		this.movieService.getCursorPaginatedMovies(this.pageSize, this.pages.find(p => p.index === this.pageIndex)?.cursor).subscribe(({ data, loading }) => {
-			if (!loading) {
-				this.movies = data.paginatedMovies;
-				this.loading = false;
-			}
-		});
-	}
-
-	pageEvent($event: PageEvent) {
+	public onPage($event: PageEvent) {
 		if (this.movies) {
-			this.loading = true;
-			const cursor = $event.previousPageIndex == null ? null : $event.previousPageIndex < $event.pageIndex ? this.movies.pageInfo.endCursor : this.movies.pageInfo.startCursor;
-			this.movieService.getCursorPaginatedMovies($event.pageSize, cursor).subscribe(({ data, loading }) => {
-				if (!loading) {
-					this.movies = data.paginatedMovies;
-					this.loading = false;
-				}
-			});
+			this.pageSize = $event.pageSize;
+			this.getMovies(this.pageSize, $event.pageIndex * this.pageSize);
 		}
+	}
+
+	private getMovies(pageSize: number, offset: number): void {
+		this.loading = true;
+		this.movieService.getOffsetPaginatedMovies(pageSize, offset).subscribe(({ data, loading }) => {
+			if (!loading) {
+				this.movies = data.offsetPaginatedMovies;
+				this.numberOfRecords = this.movies.totalCount;
+				this.pageIndex = Math.floor(offset / pageSize);  // recalculate pageIndex
+				this.loading = false;
+			}
+		});
 	}
 
 }

@@ -120,16 +120,18 @@ export class MovieService implements OnInit {
 	public getOffsetPaginatedMovies(take: number, skip: number): Observable<ApolloQueryResult<any>> {
 		return this.apollo.watchQuery<any>({
 			query: gql`
-				query offsetPaginatedMovies(take: $take, skip: $skip, order: [{name:ASC}])	{
-				  totalCount,
-				  pageInfo {
-					hasNextPage,
-					hasPreviousPage
-				  }
-				  items {
-					movieId,
-					name
-				  }
+				query getOffsetPaginatedMovies($take:Int, $skip:Int) {
+					offsetPaginatedMovies(take: $take, skip: $skip, order: [{name:ASC}])	{
+						totalCount,
+						pageInfo {
+							hasNextPage,
+							hasPreviousPage
+						}
+						items {
+							movieId,
+							name
+						}
+					}
 				}
 			`,
 			variables: {
