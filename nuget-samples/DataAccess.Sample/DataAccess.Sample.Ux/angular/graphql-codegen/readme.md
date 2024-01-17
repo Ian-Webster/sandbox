@@ -1,6 +1,6 @@
 # DataAccess.Sample.Ux
 ## Introduction
-This is an Angular project and it's purpose is to test interactions with the [DataAccess.Sample.Web](https://github.com/Ian-Webster/sandbox/tree/main/nuget-samples/DataAccess.Sample/DataAccess.Sample.Web) project from a frontend perspective.
+This is an Angular project and it's purpose is to test interactions with the [DataAccess.Sample.Web](https://github.com/Ian-Webster/sandbox/tree/main/nuget-samples/DataAccess.Sample/DataAccess.Sample.Web) project from a front-end perspective.
 
 ## Routes
 * /movie loads movies via GraphQL
@@ -38,7 +38,7 @@ Couple of things to note here;
     const config: CodegenConfig = {
       overwrite: true,
       schema: 'https://localhost:7128/graphql/',
-      documents: './graphql/movies.graphql',
+      documents: './path-to-your-queries/*.graphql',
       generates: {
         './graphql/generated.ts': {
           plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']

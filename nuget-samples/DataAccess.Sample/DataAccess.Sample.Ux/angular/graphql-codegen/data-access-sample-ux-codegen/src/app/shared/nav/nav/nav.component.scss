@@ -1,0 +1,24 @@
+.nav {
+	display: flex;
+	justify-content: space-between; /* Add this line */
+	align-items: center; /* Add this line if you want to center items vertically */
+	background-color: #424242;
+	padding: 10px 0px 10px 10px;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	z-index: 1000;
+
+	.site-name {
+		font-weight: 700;
+		font-family: 'Tektur', sans-serif;
+	}
+
+	.nav-container {
+		padding-right: 25px;
+	}
+}
+
+fa-icon {
+	padding-right: 10px; /* Adjust as needed */
+  }

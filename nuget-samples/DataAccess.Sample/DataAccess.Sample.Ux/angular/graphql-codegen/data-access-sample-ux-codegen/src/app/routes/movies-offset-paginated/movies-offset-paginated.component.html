@@ -1,0 +1,45 @@
+<h1>Offset Paginated Movies</h1>
+
+<div *ngIf="loading; else notLoading">
+	<p>Loading...</p>
+</div>
+
+<ng-template #notLoading>
+	<div class="mat-elevation-z8">
+		<table mat-table [dataSource]="movies.items" class="full-width-table">
+
+			<!-- Movie ID Column -->
+			<ng-container matColumnDef="movieId">
+				<th mat-header-cell *matHeaderCellDef>Movie ID</th>
+				<td mat-cell *matCellDef="let movie">{{ movie.movieId }}</td>
+			</ng-container>
+
+			<!-- Name Column -->
+			<ng-container matColumnDef="name">
+				<th mat-header-cell *matHeaderCellDef>Name</th>
+				<td mat-cell *matCellDef="let movie">{{ movie.name }}</td>
+			</ng-container>
+
+			<!-- View Column -->
+			<ng-container matColumnDef="view">
+				<th mat-header-cell *matHeaderCellDef></th>
+				<td mat-cell *matCellDef="let movie">
+					<a [routerLink]="['/movie', movie.movieId]"><fa-icon [icon]="faEye"></fa-icon></a>
+				</td>
+			</ng-container>
+
+			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+		</table>
+		
+		<mat-paginator 
+			[length]="numberOfRecords" 
+			[pageSizeOptions]="pageSizes"
+			[pageSize]="pageSize"
+			[pageIndex]="pageIndex"
+			[showFirstLastButtons]="true"
+			(page)="onPage($event)"
+			aria-label="Select page">
+		</mat-paginator>
+	</div>
+</ng-template>

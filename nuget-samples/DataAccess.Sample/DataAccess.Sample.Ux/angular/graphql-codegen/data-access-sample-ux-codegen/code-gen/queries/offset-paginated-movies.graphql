@@ -1,0 +1,13 @@
+query getOffsetPaginatedMovies($take:Int, $skip:Int) {
+	offsetPaginatedMovies(take: $take, skip: $skip, order: [{name:ASC}])	{
+		totalCount,
+		pageInfo {
+			hasNextPage,
+			hasPreviousPage
+		}
+		items {
+			movieId,
+			name
+		}
+	}
+}

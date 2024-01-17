@@ -1,0 +1,60 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/purple-green.css';
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+	background: #303030;
+	color: white;
+}
+
+/* Style for the main content */
+main {
+	flex: 1 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+}
+
+h1 {
+	font-size: 2.5rem;
+	font-weight: 300;
+}
+
+/* Style for all buttons */
+button {
+	margin: 5px;
+	font-size: 16px;
+}
+
+/* Style for all lists */
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+/* Style for list items */
+li {
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+}
+
+/* Style for navigation bar */
+nav {
+	background-color: #424242;
+	/* Darker background for nav bar */
+	padding: 10px;
+}
+
+/* Style for headings */
+h1 {
+	color: #9c27b0;
+	/* Purple color for headings */
+}

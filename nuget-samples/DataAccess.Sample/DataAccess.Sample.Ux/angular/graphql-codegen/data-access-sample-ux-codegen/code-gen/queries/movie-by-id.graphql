@@ -1,0 +1,9 @@
+query getMovieById($id: UUID!) {
+	movie(where: {movieId: {eq: $id}}) {
+		movieId
+		name,
+		movieGenres { 
+			genre 
+		}
+	}
+}
