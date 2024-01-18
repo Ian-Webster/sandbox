@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DataAccess.Repository" Version="2.0.5" />
-    <PackageReference Include="DataAccess.Repository.HotChocolate" Version="1.0.0" />
+    <PackageReference Include="DataAccess.Repository.HotChocolate" Version="1.1.0" />
     <PackageReference Include="HotChocolate" Version="13.7.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.7.0" />
     <PackageReference Include="HotChocolate.Data" Version="13.7.0" />
@@ -17,7 +17,6 @@
     <ProjectReference Include="..\DataAccess.Sample.Domain\DataAccess.Sample.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="EntityTypeConfigurations\" />
     <Folder Include="DatabaseContexts\" />
     <Folder Include="Queries\" />
     <Folder Include="Repositories\" />

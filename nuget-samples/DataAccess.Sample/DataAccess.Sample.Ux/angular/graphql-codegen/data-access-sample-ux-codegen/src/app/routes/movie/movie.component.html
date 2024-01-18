@@ -1,0 +1,16 @@
+<div *ngIf="loading">
+	Please wait loading.
+</div>
+<div *ngIf="!loading && movie">
+	<mat-card>
+		<mat-card-title>Movie Details</mat-card-title>
+		<mat-card-content>
+			<p><strong>ID:</strong> {{ movie.movieId }}</p>
+			<p><strong>Name:</strong> {{ movie.name }}</p>
+			<p><strong>Genre:</strong> {{ genre }}</p>
+		</mat-card-content>
+	  </mat-card>
+</div>
+<div *ngIf="!loading && !movie">
+	Movie not found.
+</div>

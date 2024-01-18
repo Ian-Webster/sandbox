@@ -1,0 +1,18 @@
+query getPaginatedMovies($first: Int!) {
+	paginatedMovies(first: $first, order: [{name: ASC}]) {
+		totalCount
+		pageInfo {
+			startCursor
+			endCursor
+			hasNextPage
+			hasPreviousPage
+		}
+		edges {
+			node {
+			movieId
+			name
+			}
+		}
+	}
+}
+	

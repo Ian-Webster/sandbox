@@ -42,6 +42,11 @@ public class MovieRepository: IMovieRepository
         return await _movieRepository.GetPagedQueryItems(context, token);
     }
 
+    public async Task<CollectionSegment<Movie>?> GetMoviesOffsetPaginatedForGraphpQuery(IResolverContext context, CancellationToken token)
+    {
+        return await _movieRepository.GetOffsetPagedQueryItems(context, token);
+    }
+
     public async Task<bool> AddMovie(Movie movie, CancellationToken token)
     {
         if (await _movieRepository.Exists(m => m.MovieId == movie.MovieId, token)) return false;

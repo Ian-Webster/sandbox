@@ -27,6 +27,7 @@ builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddGraphQLServer()
     .AddQueryType(q => q.Name("Query"))
     .AddTypeExtension<MovieQuery>()
+    //.AddQueryType<Query>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();
@@ -37,15 +38,26 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.InjectStylesheet("/swagger-ui/SwaggerDark.css");
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapGraphQL();
+
+app.UseCors(c =>
+{
+    c.WithOrigins("http://localhost:4200");
+    c.AllowAnyHeader();
+});
 
 app.Run();

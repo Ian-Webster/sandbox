@@ -1,0 +1,16 @@
+<div class="nav">
+	<div class="site-name">
+		DataAccess Sandbox
+	</div>
+	<div class="nav-container">
+		<button mat-button [matMenuTriggerFor]="main_menu">Menu</button>
+		<mat-menu #main_menu="matMenu">
+			<button mat-menu-item [matMenuTriggerFor]="films"><fa-icon [icon]="faFilm"></fa-icon> Films</button>
+		</mat-menu>
+
+		<mat-menu #films="matMenu">
+			<button mat-menu-item [routerLink]="['/movies-paged']">Paginated films (cursor)</button>
+			<button mat-menu-item [routerLink]="['/movies-offset-paged']">Paginated films (offset)</button>
+		</mat-menu>
+	</div>
+</div>
