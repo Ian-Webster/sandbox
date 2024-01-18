@@ -31,16 +31,17 @@ query getAllMovies{
 Couple of things to note here;
 * Save the file as {some-thing}.graphql in your project
 * Make sure you give your query a name (in my case I used "getAllMovies")
+* You should test the query work either by using vanilla apollo or by using a GraphQL runner (the one [built into the HotChocolate library](https://chillicream.com/products/bananacakepop) for instance)
 3. Created a typescript file named "codegen.ts" in the root of the project;
     ```typescript
     import type { CodegenConfig } from '@graphql-codegen/cli'
     
     const config: CodegenConfig = {
       overwrite: true,
-      schema: 'https://localhost:7128/graphql/',
+      schema: 'https://uri-to-your-graphql-server/',
       documents: './path-to-your-queries/*.graphql',
       generates: {
-        './graphql/generated.ts': {
+        './path-to-where-your-want-your-generated-file/generated.ts': {
           plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']
         }
       },
@@ -56,216 +57,101 @@ Couple of things to note here;
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
-        "generate": "set NODE_TLS_REJECT_UNAUTHORIZED=0&& graphql-codegen" <-- new value
+        "generate": "set NODE_TLS_REJECT_UNAUTHORIZED=0&& graphql-codegen --config codegen.ts" <-- new value
       }
     ```
-    Note: we have to set the `NODE_TLS_REJECT_UNAUTHORIZED` environment setting to false to fix an issue introduced in [this PR](https://github.com/dotansimha/graphql-code-generator/issues/1806) that changed the default behavior of the library to reject self-signed SSL certs (see this [comment](https://github.com/dotansimha/graphql-code-generator/issues/1785#issuecomment-493976501) for details) and because localhost .net certs are self certifcated the library will refused to communicate without the setting being set to false
+    Note: we have to set the `NODE_TLS_REJECT_UNAUTHORIZED` environment setting to false to fix an issue introduced in [this PR](https://github.com/dotansimha/graphql-code-generator/issues/1806) that changed the default behaviour of the library to reject self-signed SSL certs (see this [comment](https://github.com/dotansimha/graphql-code-generator/issues/1785#issuecomment-493976501) for details) and because localhost .net certs are self certifcated the library will refused to communicate without the setting being set to false
 5. Run the [DataAccess.Sample.Web](https://github.com/Ian-Webster/sandbox/tree/main/nuget-samples/DataAccess.Sample/DataAccess.Sample.Web)
-6. Run the new npm command inserted in step 3 with the command `npm run generate`
-7. Next you'll need to add some configuration for Apollo in your app.config.ts, before doing this run `ng add apollo-angular` (see https://the-guild.dev/graphql/apollo-angular/docs/get-started) this should scaffold most the setup for you, your file should look something like this;
-```typescript
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+6. Next you'll need to set up several configuration files for Apollo, you can run `ng add apollo-angular` (see https://the-guild.dev/graphql/apollo-angular/docs/get-started) to have these automatically created. You need a graphql.provider.ts file in the root of your app folder, it should look like this;
+    ```typescript
+	import { Apollo, APOLLO_OPTIONS } from 'apollo-angular';
+	import { HttpLink } from 'apollo-angular/http';
+	import { ApplicationConfig, inject } from '@angular/core';
+	import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 
-import { routes } from './app.routes';
-import { provideHttpClient, withFetch } from '@angular/common/http';
-import { provideClientHydration } from '@angular/platform-browser';
-import { APOLLO_OPTIONS } from 'apollo-angular';
-import { InMemoryCache } from '@apollo/client';
-import { HttpLink } from 'apollo-angular/http';
+	const uri = 'https://localhost:7128/graphql/'; // <-- add the URL of the GraphQL server here
+	export function apolloOptionsFactory(): ApolloClientOptions<any> {
+		const httpLink = inject(HttpLink);
+		return {
+			link: httpLink.create({ uri }),
+			cache: new InMemoryCache(),
+		};
+	}
 
-export const appConfig: ApplicationConfig = {
-	providers: [
-		provideHttpClient(withFetch()), 
-		provideRouter(routes), 
-		provideClientHydration(),
+	export const graphqlProvider: ApplicationConfig['providers'] = [
+		Apollo,
 		{
 			provide: APOLLO_OPTIONS,
-			useFactory(httpLink: HttpLink) {
-			  return {
-				cache: new InMemoryCache(),
-				link: httpLink.create({
-				  uri: 'https://localhost:7128/graphql/',
-				}),
-			  };
-			},
-			deps: [HttpLink],
-		  },
-	] 
-};
+			useFactory: apolloOptionsFactory,
+		},
+	];
+    ```
+	if you make use of the Apollo scaffolding the URI variable should be correct, if you are creating the file for yourself you'll need to make sure that matches your GraphQL back-end.
+7. In addition to the new file mentioned above you'll also need to modify your app.config.ts, to look something like this (as noted previously if you use the Apollo scaffolding this should be done for you);
+	```typescript
+	import { ApplicationConfig } from '@angular/core';
+	import { ApplicationConfig } from '@angular/core';
+	import { provideRouter } from '@angular/router';
 
-```
-Make sure `uri` is set to your graphql endpoint
-8. 
+	import { routes } from './app.routes';
+	import { provideHttpClient, withFetch } from '@angular/common/http';
+	import { graphqlProvider } from './graphql.provider';
+	import { provideAnimations } from '@angular/platform-browser/animations';
 
-Todo:
- tidy up this mess and finish instructions above;
+	export const appConfig: ApplicationConfig = {
+		providers: [
+			provideHttpClient(withFetch()),
+			provideRouter(routes),
+			provideHttpClient(),
+			graphqlProvider,
+			provideAnimations()
+		]
+	};
+	```
+8. Run the new npm command inserted in step 3 with the command `npm run generate`, you should see your code file generated
+9. As at time of writing this document (with graphql-codegen/cli version 5 and graphql-codegen/typescript 4.0.1) there is a bug with the generated code that leads to a build error, to resolve this;
+    1. Open the generated file
+    2. For each of the GraphQL queries you feed to the generator there will be a export class statement in the generated file, they will look something like this;
+        ```typescript
+        @Injectable({
+        	providedIn: 'root'
+        })
+        export class GetOffsetPaginatedMoviesGQL extends Apollo.Query<GetOffsetPaginatedMoviesQuery, GetOffsetPaginatedMoviesQueryVariables> {
+        	document = GetOffsetPaginatedMoviesDocument;
+        
+        	constructor(apollo: Apollo.Apollo) {
+        		super(apollo);
+        	}
+        }
+        ```
+    3. The issue is with  the `document =  someQueryDocument` line - you need to add "override" to fix the build error, so using the above example it would look like the following after a fix;
+		```typescript
+		@Injectable({
+			providedIn: 'root'
+		})
+		export class GetOffsetPaginatedMoviesGQL extends Apollo.Query<GetOffsetPaginatedMoviesQuery, GetOffsetPaginatedMoviesQueryVariables> {
+			override document = GetOffsetPaginatedMoviesDocument;
 
- npm i graphql
-npm i -D typescript @graphql-codegen/cli
-
-
-	//"generate": "set NODE_ENV=production&& graphql-codegen"
-	
-	
-import type { CodegenConfig } from '@graphql-codegen/cli'
- 
-const config: CodegenConfig = {
-  schema: 'https://localhost:7128/graphql',
-  documents: './src/**/*.ts',
-  generates: {
-    './graphql/generated.ts': {
-      plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular', 'introspection']
-    }
-  }
-}
-export default config
-
-
-import type { CodegenConfig } from '@graphql-codegen/cli'
- 
-const config: CodegenConfig = {
-  schema: 'https://localhost:7128/graphql',
-  documents: "src/**/*.graphql",
-  generates: {
-    './graphql/generated.ts': {
-      plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']
-    },
-	'introspection.json': {
-		plugins: ['introspection'],
-		config: {
-		  minify: false
+			constructor(apollo: Apollo.Apollo) {
+				super(apollo);
+			}
 		}
+		```
+10. You should now be able to make use of the helper classes to run queries, here is an example of loading a movie by id;
+```typescript
+import { GetMovieByIdGQL } from "../../../generated/graphql"; // import the get movies helper object generated by graphql-code-gen
+
+@Injectable({ providedIn: 'root' })
+export class MovieService implements OnInit {
+
+	public constructor(private moviesByIdClient: GetMovieByIdGQL) { // inject the helper
 	}
-  }
+
+	ngOnInit(): void {
+	}
+
+	public getMovieById(movieId: string): Observable<ApolloQueryResult<any>> {
+		return this.moviesByIdClient.fetch({ id: movieId }); // call fetch passing in the movie id parameter
+	}
 }
-export default config
-
-https://www.apollographql.com/tutorials/lift-off-part1/09-codegen
-
-https://www.apollographql.com/tutorials/intro-hotchocolate/01-overview-setup
-
-import type { CodegenConfig } from '@graphql-codegen/cli'
- -- generates a series of output files - https://www.apollographql.com/tutorials/lift-off-part1/09-codegen
-const config: CodegenConfig = {
-  schema: 'https://localhost:7128/graphql',
-  documents: ["src/**/*.tsx"],
-  generates: {
-    './src/__generated__/': {
-      //plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular'],
-	  preset: "client",
-      presetConfig: {
-        gqlTagName: "gql",
-      },
-    },
-	/*'introspection.json': {
-		plugins: ['introspection'],
-		config: {
-		  minify: false
-		}
-	}*/
-  },
-  ignoreNoDocuments: true,
-}
-export default config
-
-import type { CodegenConfig } from '@graphql-codegen/cli'
-
-const config: CodegenConfig = {
-  overwrite: true,
-  schema: 'https://localhost:7128/graphql/',
-  documents: './src/**/*.ts',
-  generates: {
-    './graphql/generated.ts': {
-      plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']
-    }
-  },
-  ignoreNoDocuments: true,
-}
-export default config
-
-// import type { CodegenConfig } from '@graphql-codegen/cli'
-
-// const config: CodegenConfig = {
-//   overwrite: true,
-//   schema: 'http://localhost:7128/api/graph',
-//   documents: 'src/graphql/**/*.gql',
-//   generates: {
-//     './src/graphql/': {
-//       preset: 'client',
-//       plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular'],
-//       config: {
-//         useTypeImports: true
-//       }
-//     }
-//   }
-// }
-
-// export default config
-
-
-https://github.com/dotansimha/graphql-code-generator/issues/4855
-
-https://medium.com/angular-in-depth/configuring-a-angular-cli-project-with-graphql-37217f66d419
-
-https://angular.schule/blog/2018-06-apollo-graphql-code-generator
-
-https://the-guild.dev/graphql/apollo-angular/docs/get-started
-
-https://github.com/apollographql/apollo-client/issues/7318
-
-import type { CodegenConfig } from '@graphql-codegen/cli'
-
-const config: CodegenConfig = {
-  overwrite: true,
-  schema: 'https://localhost:7128/graphql/',
-  documents: './graphql/movies.graphql',
-  generates: {
-    './graphql/generated.ts': {
-      plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']
-    }
-  },
-  //ignoreNoDocuments: true,
-}
-export default config
-
-
-query getAllMovies{
-  movies (order: [{name:ASC}]),
-  {
-    movieId,
-    name
-  }
-}
-
-
-query getAllMovies{
-  movies (order: [{name:ASC}]),
-  {
-    movieId,
-    name
-  }
-}
-
-import type { CodegenConfig } from '@graphql-codegen/cli'
-
-const config: CodegenConfig = {
-  overwrite: true,
-  schema: 'https://localhost:7128/graphql/',
-  documents: './src/graphql/*.ts',
-  //documents: './schema.graphql',
-  generates: {
-    './src/graphql/': {
-      preset: 'client',
-      plugins: ['typescript', 'typescript-operations', 'typescript-apollo-angular']
-    }
-  },
-  //ignoreNoDocuments: true,
-}
-
-export default config
-
-
-
-https://www.apollographql.com/tutorials/intro-hotchocolate/01-overview-setup
-https://www.apollographql.com/docs/apollo-server/workflow/generate-types/ 
+``` 

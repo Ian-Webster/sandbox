@@ -211,9 +211,39 @@ export type UuidOperationFilterInput = {
   nlte?: InputMaybe<Scalars['UUID']['input']>;
 };
 
-export const GetPaginatedMoviesDocument = gql`
-    query getPaginatedMovies($first: Int!, $after: String) {
+export const GetPaginatedMoviesAfterDocument = gql`
+    query getPaginatedMoviesAfter($first: Int!, $after: String!) {
   paginatedMovies(first: $first, order: [{name: ASC}], after: $after) {
+    totalCount
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+    edges {
+      node {
+        movieId
+        name
+      }
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetPaginatedMoviesAfterGQL extends Apollo.Query<GetPaginatedMoviesAfterQuery, GetPaginatedMoviesAfterQueryVariables> {
+    override document = GetPaginatedMoviesAfterDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetPaginatedMoviesDocument = gql`
+    query getPaginatedMovies($first: Int!) {
+  paginatedMovies(first: $first, order: [{name: ASC}]) {
     totalCount
     pageInfo {
       startCursor
@@ -289,9 +319,16 @@ export const GetOffsetPaginatedMoviesDocument = gql`
       super(apollo);
     }
   }
+export type GetPaginatedMoviesAfterQueryVariables = Exact<{
+  first: Scalars['Int']['input'];
+  after: Scalars['String']['input'];
+}>;
+
+
+export type GetPaginatedMoviesAfterQuery = { __typename?: 'Query', paginatedMovies?: { __typename?: 'PaginatedMoviesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', startCursor?: string | null, endCursor?: string | null, hasNextPage: boolean, hasPreviousPage: boolean }, edges?: Array<{ __typename?: 'PaginatedMoviesEdge', node: { __typename?: 'Movie', movieId: any, name: string } }> | null } | null };
+
 export type GetPaginatedMoviesQueryVariables = Exact<{
   first: Scalars['Int']['input'];
-  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

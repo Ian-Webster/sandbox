@@ -5,14 +5,21 @@ import { Apollo, gql } from "apollo-angular";
 import { BehaviorSubject, Observable, lastValueFrom, map } from "rxjs";
 import { SortEnumType } from "../../domain/enums/sort.enum";
 import { parse } from "graphql";
-import { GetMovieByIdGQL } from "../../../generated/graphql";
+import { GetMovieByIdGQL, GetOffsetPaginatedMoviesGQL, GetPaginatedMoviesAfterGQL, GetPaginatedMoviesGQL } from "../../../generated/graphql";
 
 @Injectable({ providedIn: 'root' })
 export class MovieService implements OnInit {
 
 	public movies: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-	public constructor(private httpClient: HttpClient, private apollo: Apollo, private moviesByIdClient: GetMovieByIdGQL) {
+	public constructor(
+		private httpClient: HttpClient, 
+		private apollo: Apollo, 
+		private moviesByIdClient: GetMovieByIdGQL,
+		private moviesPaginatedByOffsetClient: GetOffsetPaginatedMoviesGQL,
+		private moviesPaginatedByCursorClient: GetPaginatedMoviesGQL,
+		private moviesPaginatedByCursorWithAfterClient: GetPaginatedMoviesAfterGQL
+		) {
 	}
 
 	ngOnInit(): void {
@@ -27,37 +34,7 @@ export class MovieService implements OnInit {
 		}
 	}
 
-	public getAllMovies(): Observable<ApolloQueryResult<any>> {
-		return this.apollo.watchQuery<any>({
-			query: gql`
-				query getAllMovies {
-					movies (order: [{name:ASC}]) {
-						movieId
-						name
-					}
-				}
-			`,
-		}).valueChanges;
-	}
-
 	public getMovieById(movieId: string): Observable<ApolloQueryResult<any>> {
-		// return this.apollo.watchQuery<any>({
-		// 	query: gql`
-		// 		query getMovieById($id: UUID!) {
-		// 			movie(where: {movieId: {eq: $id}}) {
-		// 				movieId
-		// 				name,
-		// 				movieGenres { 
-		// 					genre 
-		// 				}
-		// 			}
-		// 		}
-		// 	`,
-		// 	variables: {
-		// 		id: movieId,
-		// 	},
-		// }).valueChanges;
-		debugger
 		return this.moviesByIdClient.fetch({ id: movieId });
 	}
 
@@ -68,50 +45,10 @@ export class MovieService implements OnInit {
 	 * @returns 
 	 */
 	public getCursorPaginatedMovies(take: number, after?: string | undefined): Observable<ApolloQueryResult<any>> {
-		let queryString = `
-		  query getPaginatedMovies($first: Int!`;
-
 		if (after) {
-			queryString += `, $after: String) {
-				paginatedMovies(first: $first, order: [{name: ASC}], after: $after`;
-		} else {
-			queryString += `) {
-				paginatedMovies(first: $first, order: [{name: ASC}]`;
+			return this.moviesPaginatedByCursorWithAfterClient.fetch({ first: take, after: after });
 		}
-
-		queryString += `) {
-			totalCount
-			pageInfo {
-				startCursor
-				endCursor
-				hasNextPage
-				hasPreviousPage
-			}
-			edges {
-				node {
-				movieId
-				name
-				}
-			}
-			}
-		}`;
-
-		if (after) {
-			return this.apollo.watchQuery<any>({
-				query: gql`${queryString}`,
-				variables: {
-					first: take,
-					after: after
-				}
-			}).valueChanges;
-		}
-
-		return this.apollo.watchQuery<any>({
-			query: gql`${queryString}`,
-			variables: {
-				first: take
-			}
-		}).valueChanges;
+		return this.moviesPaginatedByCursorClient.fetch({ first: take});
 	}
 
 	/**
@@ -121,26 +58,6 @@ export class MovieService implements OnInit {
 	 * @returns 
 	 */
 	public getOffsetPaginatedMovies(take: number, skip: number): Observable<ApolloQueryResult<any>> {
-		return this.apollo.watchQuery<any>({
-			query: gql`
-				query getOffsetPaginatedMovies($take:Int, $skip:Int) {
-					offsetPaginatedMovies(take: $take, skip: $skip, order: [{name:ASC}])	{
-						totalCount,
-						pageInfo {
-							hasNextPage,
-							hasPreviousPage
-						}
-						items {
-							movieId,
-							name
-						}
-					}
-				}
-			`,
-			variables: {
-				take: take,
-				skip: skip
-			},
-		}).valueChanges;
+		return this.moviesPaginatedByOffsetClient.fetch({ take: take, skip: skip });
 	}
 }

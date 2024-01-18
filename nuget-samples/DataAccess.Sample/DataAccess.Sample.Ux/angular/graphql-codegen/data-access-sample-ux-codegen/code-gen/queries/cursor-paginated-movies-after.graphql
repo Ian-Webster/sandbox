@@ -1,5 +1,5 @@
-query getPaginatedMovies($first: Int!) {
-	paginatedMovies(first: $first, order: [{name: ASC}]) {
+query getPaginatedMoviesAfter($first: Int!, $after: String!) {
+	paginatedMovies(first: $first, order: [{name: ASC}], after: $after) {
 		totalCount
 		pageInfo {
 			startCursor
