@@ -15,6 +15,7 @@ namespace Messaging.Example.Business.Services
         /// ctor
         /// </summary>
         /// <param name="topic">The topic this consumer should subscribe to</param>
+        /// <param name="consumerName">The name of the consumer group</param>
         public ConsumerService(string topic, string consumerName)
         {
             // set up consumer configuration
