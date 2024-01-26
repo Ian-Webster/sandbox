@@ -15,13 +15,13 @@ namespace Messaging.Example.Business.Services
         /// ctor
         /// </summary>
         /// <param name="topic">The topic this consumer should subscribe to</param>
-        public ConsumerService(string topic)
+        public ConsumerService(string topic, string consumerName)
         {
             // set up consumer configuration
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = "localhost:9092",
-                GroupId = "test-consumer-group",
+                GroupId = consumerName,
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
@@ -42,6 +42,7 @@ namespace Messaging.Example.Business.Services
             try
             {
                 var consumeResult = consumer.Consume();
+                consumer.Commit(); // commit the message so we don't get it again
                 return consumeResult.Message.Value;
             }
             catch (ConsumeException ex)

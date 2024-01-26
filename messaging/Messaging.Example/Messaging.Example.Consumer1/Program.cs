@@ -1,6 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Messaging.Example.Consumer1;
+﻿using Messaging.Example.Consumer1;
 
-Console.Title = "Messaging.Example.Consumer1";
+Console.Title = "Consumer1";
 
 (new MessageConsumer()).StartConsuming();   

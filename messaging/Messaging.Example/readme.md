@@ -218,6 +218,7 @@ The following instructions are taken mostly from [this guide](https://developer.
 			while (true)
 			{
 				var message = _allConsumer.ConsumeMessage();
+                 consumer.Commit(); // commit the message so we don't get it again
 				AnsiConsole.MarkupLine($"[bold teal]Successfully received message {counter} {message}[/]");
 				counter++;
 			}
@@ -291,7 +292,125 @@ Now we can send the "HelloAll" message we'll make modifications to the producer 
     ```
 4. Create some messages of type "HelloConsumer1" and "HelloConsumer2", use your Kafka IDE to verify the messages are going into the correct topics
 
-## Modifying the consumer
-We had previously set up Consumer1 to receive the "HelloAll" messages, both consumers will eventually receive these but to start we'll set finish setting up consumer 1 to receive the "HelloConsumer1" message;
-1. 
+## Modifying the consuming code 1
+We had previously set up Consumer1 to receive the "HelloAll" messages, both consumers will eventually receive these but to start we'll finish setting up consumer 1 to receive the "HelloConsumer1" message.
 
+In this example we'll modify the consuming code to start a second instances of the ConsumerService requesting messages from the "HelloConsumer1" topic.
+```csharp
+public void StartConsuming()
+{ 
+    AnsiConsole.MarkupLine($"[bold magenta3]Consumer1 listening for messages[/]");
+    var thread1 = new Thread(() => ConsumerAllMessages()) { IsBackground = true };
+    var thread2 = new Thread(() => Consumer1Messages()) { IsBackground = true };
+    thread1.Start();
+    thread2.Start();
+    while(true)
+    {
+
+    }
+}
+
+public void ConsumerAllMessages()
+{
+    int counter = 1;
+    while (true)
+    {
+        var message = _allConsumer.ConsumeMessage();
+        AnsiConsole.MarkupLine($"[bold teal]Successfully received message {counter} {message}[/]");
+        counter++;
+    }
+}
+
+public void Consumer1Messages()
+{
+    int counter = 1;
+    while (true)
+    {
+        var message = _consumer1.ConsumeMessage();
+        AnsiConsole.MarkupLine($"[bold magenta3]Successfully received message {counter} {message}[/]");
+        counter++;
+    }
+}
+```
+This is a very basic implementation using two threads for each group we want to consume from, for an actual implementation we'd likely want to a background task or similar to run our message consumption from.
+
+## Modifying the consuming code 2
+We now have consumer1 set up and consuming it's message and the "all" message, next we'll set up the second consumer to consumer the "all" message plus "HelloConsumer2".
+
+We start by changing the consumer service to make the consumer group id configurable so allow us to have a consumer group for Consumer1 and Consumer2 - if we didn't do this the "HelloAll" messages would be round-robined between the two consumers, we want each consumer to get a copy of the message;
+```csharp
+/// <summary>
+/// ctor
+/// </summary>
+/// <param name="topic">The topic this consumer should subscribe to</param>
+/// <param name="consumerName">The name of the consumer group</param>
+public ConsumerService(string topic, string consumerName)
+{
+    // set up consumer configuration
+    var consumerConfig = new ConsumerConfig
+    {
+        BootstrapServers = "localhost:9092",
+        GroupId = consumerName,
+        AutoOffsetReset = AutoOffsetReset.Earliest
+    };
+
+    // create the consumer
+    consumer = new ConsumerBuilder<string, TMessageType>(consumerConfig)
+        .SetValueDeserializer(new MessageSerialiser<TMessageType>()) // because we are sending a custom object we need to tell Kafka how to deserialise it
+        .Build();
+
+    consumer.Subscribe(topic); // subscribe to the topic
+}
+```
+
+Finally we can set up Consumer2's consumption code;
+```csharp
+public class MessageConsumer
+{
+    private ConsumerService<HelloAllMessage> _allConsumer;
+    private ConsumerService<HelloConsumer2Message> _consumer2;
+
+    public MessageConsumer()
+    {
+        _allConsumer = new ConsumerService<HelloAllMessage>("HelloAll", "Consumer2");
+        _consumer2 = new ConsumerService<HelloConsumer2Message>("HelloConsumer2", "Consumer2");
+    }
+
+    public void StartConsuming()
+    { 
+        AnsiConsole.MarkupLine($"[bold orange4_1]Consumer2 listening for messages[/]");
+        var thread1 = new Thread(() => ConsumerAllMessages()) { IsBackground = true };
+        var thread2 = new Thread(() => Consumer2Messages()) { IsBackground = true };
+        thread1.Start();
+        thread2.Start();
+        while(true)
+        {
+
+        }
+    }
+
+    public void ConsumerAllMessages()
+    {
+        int counter = 1;
+        while (true)
+        {
+            var message = _allConsumer.ConsumeMessage();
+            AnsiConsole.MarkupLine($"[bold teal]Successfully received message {counter} {message}[/]");
+            counter++;
+        }
+    }
+
+    public void Consumer2Messages()
+    {
+        int counter = 1;
+        while (true)
+        {
+            var message = _consumer2.ConsumeMessage();
+            AnsiConsole.MarkupLine($"[bold orange4_1]Successfully received message {counter} {message}[/]");
+            counter++;
+        }
+    }
+
+}
+```
+This looks broadly the same as Consumer1, the main differences are we subscribe to a different topic and expect a different type from out second consumer
