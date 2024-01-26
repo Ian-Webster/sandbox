@@ -1,12 +1,20 @@
 ﻿using Messaging.Example.Business.Models;
+using Messaging.Example.Business.Services;
 using Spectre.Console;
 
 namespace Messaging.Example.Producer
 {
     // TODO: produce some messages https://developer.confluent.io/get-started/dotnet/
-    public static class MessageSender
+    public class MessageSender
     {
-        public static void RenderMainMenu()
+        private readonly ProducerService producer;
+
+        public MessageSender()
+        {
+            producer = new ProducerService();
+        }
+
+        public void RenderMainMenu()
         {
             Console.Clear();
 
@@ -40,7 +48,7 @@ namespace Messaging.Example.Producer
             }
         }
 
-        private static void RenderHowManyMenu(MessageTypes messageType)
+        private void RenderHowManyMenu(MessageTypes messageType)
         {
             var numberToSend = AnsiConsole.Prompt(
                     new TextPrompt<int>($"How many {messageType} messages would you like to send? If you want a random amount enter 0")
@@ -74,7 +82,7 @@ namespace Messaging.Example.Producer
                 RenderMainMenu();           
         }
 
-        private static bool SendMessages(MessageTypes messageType, int numberToSend)
+        private bool SendMessages(MessageTypes messageType, int numberToSend)
         {
 
             for (int i = 0; i < numberToSend; i++)
@@ -82,12 +90,16 @@ namespace Messaging.Example.Producer
                 var message = CreateMessage(messageType);
 
                 AnsiConsole.MarkupLine($"[bold green]Generated message {message} {i+1} of {numberToSend}[/]");
+
+                producer.Produce("HelloAll", message);
             }
+
+            producer.Flush();
            
             return true;
         }
 
-        private static MessageBase CreateMessage(MessageTypes messageType)
+        private MessageBase CreateMessage(MessageTypes messageType)
         {
             switch (messageType)
             {

@@ -1,18 +1,20 @@
-﻿namespace Messaging.Example.Business.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Messaging.Example.Business.Models
 {
     public class MessageBase
     {
-        public Guid MessageId { get; }
+        protected Guid MessageId { get; set; }
 
-        public string Message { get; }
+        protected string Message { get; set; }
 
-        public DateTime Created { get; }
+        protected DateTime Created { get; set; }
 
         protected MessageBase(string message)
         {
             MessageId = Guid.NewGuid();
-            Message = message;
-            Created = DateTime.UtcNow;
+            Created = DateTime.Now;
+            Message = message;  
         }
 
         public override string ToString()

@@ -1,3 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello I'm the first consumer!");
-Console.ReadKey();
+using Messaging.Example.Consumer1;
+
+Console.Title = "Messaging.Example.Consumer1";
+
+(new MessageConsumer()).StartConsuming();   

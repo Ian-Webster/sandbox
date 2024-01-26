@@ -1,9 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Messaging.Example.Business.Services;
 using Messaging.Example.Producer;
-using Spectre.Console;
 
 Console.Title = "Messaging.Example.Producer";
 
-MessageSender.RenderMainMenu();
+
+(new MessageSender()).RenderMainMenu();
 
 
