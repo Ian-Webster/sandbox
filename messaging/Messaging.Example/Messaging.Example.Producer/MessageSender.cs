@@ -84,14 +84,13 @@ namespace Messaging.Example.Producer
 
         private bool SendMessages(MessageTypes messageType, int numberToSend)
         {
-
             for (int i = 0; i < numberToSend; i++)
             {
-                var message = CreateMessage(messageType);
+                var messageData = CreateMessage(messageType);
 
-                AnsiConsole.MarkupLine($"[bold green]Generated message {message} {i+1} of {numberToSend}[/]");
+                AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i+1} of {numberToSend}[/]");
 
-                producer.Produce("HelloAll", message);
+                producer.Produce(messageData.topicName, messageData.message);
             }
 
             producer.Flush();
@@ -99,16 +98,16 @@ namespace Messaging.Example.Producer
             return true;
         }
 
-        private MessageBase CreateMessage(MessageTypes messageType)
+        private (MessageBase message, string topicName) CreateMessage(MessageTypes messageType)
         {
             switch (messageType)
             {
                 case MessageTypes.HelloAll:
-                    return new HelloAllMessage();
+                    return (new HelloAllMessage(), "HelloAll");
                 case MessageTypes.HelloConsumer1:
-                    return new HelloConsumer1Message();
+                    return (new HelloConsumer1Message(), "HelloConsumer1");
                 case MessageTypes.HelloConsumer2:
-                    return new HelloConsumer2Message();
+                    return (new HelloConsumer2Message(), "HelloConsumer2");
                 case MessageTypes.Random:
                     {
                         var bogus = new Bogus.Faker();

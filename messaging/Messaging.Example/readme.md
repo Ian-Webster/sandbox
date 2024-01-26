@@ -40,17 +40,17 @@ The following instructions are largely based on [this guide](https://developer.c
 
    public class MessageBase
     {
-        public Guid MessageId { get; }
+        protected Guid MessageId { get; set; }
     
-        public string Message { get; }
+        protected string Message { get; set; }
     
-        public DateTime Created { get; }
+        protected DateTime Created { get; set; }
     
         protected MessageBase(string message)
         {
             MessageId = Guid.NewGuid();
-            Message = message;
-            Created = DateTime.UtcNow;
+            Created = DateTime.Now;
+            Message = message;  
         }
     
         public override string ToString()
@@ -228,4 +228,70 @@ The following instructions are taken mostly from [this guide](https://developer.
 ## Testing
 1. Create a topic named "HelloAll" in Kafka
 2. Run the producer and consumer applications
-3. Producer some "HelloAll" messages, you should see a "received" for each message you created
+3. Producer some "HelloAll" messages, you should see a "received" for each message you created.
+
+## Modifying the produce
+
+Now we can send the "HelloAll" message we'll make modifications to the producer so it can also send the "HelloConsumer1" and "HellowConsumer2" messages;
+
+1. Add two new topics to your Kafka instances, named "HelloConsumer1" and "HelloConsumer2"
+2. Create models for the two messages, in the example we make use of the base message class;
+    ```csharp
+    public class HelloConsumer1Message : MessageBase
+    {
+        public HelloConsumer1Message(): base("Hello Consumer 1")
+        {
+        }
+    }
+
+    public class HelloConsumer2Message : MessageBase
+    {
+        public HelloConsumer2Message(): base("Hello Consumer 2")
+        {
+        }
+    }
+    ```
+3. Modify the code that produces and sends your messages to produce the new types;
+    ```csharp
+    private bool SendMessages(MessageTypes messageType, int numberToSend)
+    {
+        for (int i = 0; i < numberToSend; i++)
+        {
+            var messageData = CreateMessage(messageType);
+
+            AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i+1} of {numberToSend}[/]");
+
+            producer.Produce(messageData.topicName, messageData.message);
+        }
+
+        producer.Flush();
+           
+        return true;
+    }
+
+   private (MessageBase message, string topicName) CreateMessage(MessageTypes messageType)
+    {
+        switch (messageType)
+        {
+            case MessageTypes.HelloAll:
+                return (new HelloAllMessage(), "HelloAll");
+            case MessageTypes.HelloConsumer1:
+                return (new HelloConsumer1Message(), "HelloConsumer1");
+            case MessageTypes.HelloConsumer2:
+                return (new HelloConsumer2Message(), "HelloConsumer2");
+            case MessageTypes.Random:
+                {
+                    var bogus = new Bogus.Faker();
+                    return CreateMessage(bogus.PickRandomWithout(MessageTypes.Random));
+                }
+            default:
+                throw new Exception("Invalid message type");
+        }
+    }
+    ```
+4. Create some messages of type "HelloConsumer1" and "HelloConsumer2", use your Kafka IDE to verify the messages are going into the correct topics
+
+## Modifying the consumer
+We had previously set up Consumer1 to receive the "HelloAll" messages, both consumers will eventually receive these but to start we'll set finish setting up consumer 1 to receive the "HelloConsumer1" message;
+1. 
+
