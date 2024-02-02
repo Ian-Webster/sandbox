@@ -3,10 +3,7 @@ using Messaging.Outbox.Domain.Messages;
 using Messaing.Shared.Business.Consumer;
 using Messaing.Shared.Business.Models;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using Spectre.Console;
-using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
 
 namespace Messaging.OutBox.Consumer1
 {

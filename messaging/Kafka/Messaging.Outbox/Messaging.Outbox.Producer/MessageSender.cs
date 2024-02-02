@@ -1,17 +1,41 @@
 ﻿using Confluent.Kafka;
+using DataAccess.Repository;
+using Messaging.Outbox.Data;
+using Messaging.Outbox.Data.Entities;
+using Messaging.Outbox.Data.Enums;
+using Messaging.Outbox.Data.Repositories;
 using Messaging.Outbox.Domain.Messages;
 using Messaing.Shared.Business.Models;
 using Messaing.Shared.Business.Producer;
+using Messaing.Shared.Business.Serialisers;
+using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
+using System.Text.Json;
 
 namespace Messaging.Outbox.Producer
 {
     public class MessageSender
     {
+        private readonly MessageRepository _messageRepo;
         private readonly IKafkaProducer<OutboxMessageBase> producer;
+        private readonly ByteArraySerialiser<OutboxMessageBase> _serialiser;
 
         public MessageSender()
         {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDbContext<OutboxContent>(
+                // this should work for API projects but won't work here because we aren't really using DI
+                /*options => options.UseNpgsql("Host=localhost:5432;Username=postgres;Password=postgres;Database=outbox")
+                .UseSnakeCaseNamingConvention()*/
+            );
+
+            serviceCollection.AddScoped<RepositoryFactory<OutboxContent>>();
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            //var dbContext = serviceProvider.GetService<OutboxContent>();
+            var repositoryFactory = serviceProvider.GetService<RepositoryFactory<OutboxContent>>();
+            _messageRepo = new MessageRepository(repositoryFactory);
+
             producer = new KafkaProducer<OutboxMessageBase>(
                 new ProducerConfiguration
                 {
@@ -20,6 +44,8 @@ namespace Messaging.Outbox.Producer
                     MessageTimeout = 10000
                 }
             );
+
+            _serialiser = new ByteArraySerialiser<OutboxMessageBase>();
         }
 
         public async Task RenderMainMenu()
@@ -71,7 +97,7 @@ namespace Messaging.Outbox.Producer
                             };
                         }));
 
-            if (numberToSend == 0) numberToSend = new System.Random().Next(1, 100);
+            if (numberToSend == 0) numberToSend = new Random().Next(1, 100);
 
             Console.WriteLine();
 
@@ -95,6 +121,14 @@ namespace Messaging.Outbox.Producer
             for (int i = 0; i < numberToSend; i++)
             {
                 var messageData = CreateMessage(messageType);
+
+                await _messageRepo.AddMessage(new Message
+                {
+                    MessageId = Guid.NewGuid(),
+                    MessageContent = JsonSerializer.SerializeToUtf8Bytes(messageData),
+                    CreatedDate = DateTime.UtcNow,
+                    Status = MessageStatus.Saved
+                }, new CancellationToken()); ;
 
                 AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i + 1} of {numberToSend}[/]");
 
