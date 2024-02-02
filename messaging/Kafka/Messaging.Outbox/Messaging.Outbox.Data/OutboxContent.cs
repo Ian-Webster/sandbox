@@ -1,5 +1,6 @@
 ﻿using Messaging.Outbox.Data.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Messaging.Outbox.Data
 {
@@ -9,13 +10,14 @@ namespace Messaging.Outbox.Data
 
         override protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql("Host=localhost:5432;Username=postgres;Password=postgres;Database=outbox")
+            optionsBuilder
+                .UseNpgsql("Host=localhost:5432;Username=postgres;Password=postgres;Database=outbox")
                 .UseSnakeCaseNamingConvention();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasPostgresEnum<MessageStatus>("public", "message_status_enum");
+            modelBuilder.HasPostgresEnum<MessageStatus>("message_status_enum");
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OutboxContent).Assembly);

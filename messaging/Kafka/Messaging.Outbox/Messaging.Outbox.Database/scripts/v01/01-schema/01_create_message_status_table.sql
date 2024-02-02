@@ -8,12 +8,9 @@
  */
 
 -- changeset webster:v1-initial-creation
--- comment: create message status enum
-CREATE TYPE message_status_enum AS ENUM (
-    'Not set', 
-    'Saved', 
-    'Not persisted', 
-    'Possibly persisted', 
-    'Persisted'
+-- comment: create message status
+CREATE TABLE messages_status (
+    status_id smallint PRIMARY KEY,
+    status_name varchar(50) NOT NULL
 );
--- DROP TYPE IF EXISTS message_status_enum;
+-- rollback DROP TABLE IF EXISTS messages_status;

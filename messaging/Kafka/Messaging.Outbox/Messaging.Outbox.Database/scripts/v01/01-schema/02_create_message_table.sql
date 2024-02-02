@@ -14,8 +14,9 @@ CREATE TABLE public.message (
     message_content bytea NOT NULL,
     created_date timestamp with time zone NOT NULL,
     sent_date timestamp with time zone,
-    status message_status_enum NOT NULL DEFAULT 'Not set',
+    status_id smallint NOT NULL DEFAULT 0,
 	error text,
-    CONSTRAINT message_pk PRIMARY KEY (message_id)
+    CONSTRAINT message_pk PRIMARY KEY (message_id),
+	FOREIGN KEY (status_id) REFERENCES messages_status(status_id)
 );
 -- rollback DROP TABLE IF EXISTS public.message

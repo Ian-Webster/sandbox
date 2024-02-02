@@ -2,10 +2,10 @@
 {
     public enum MessageStatus
     {
-        NotSet,
-        Saved,
-        NotPersisted,
-        PossiblyPersisted,
-        Persisted
+        NotSet = 0,
+        Saved = 1,
+        NotPersisted = 2,
+        PossiblyPersisted = 3,
+        Persisted = 4
     }
 }
