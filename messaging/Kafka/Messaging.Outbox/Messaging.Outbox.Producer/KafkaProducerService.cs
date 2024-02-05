@@ -36,7 +36,7 @@ namespace Messaging.Outbox.Producer
                     continue;
                 }
 
-                unsentMessages.ToList().ForEach(async m =>
+                foreach (var m in unsentMessages)
                 {
                     var hydratedMessage = JsonSerializer.Deserialize<OutboxMessageBase>(m.MessageContent);
                     var sendResult = _producer.SendMessage(m.Topic, hydratedMessage, cancellationToken);
@@ -44,6 +44,7 @@ namespace Messaging.Outbox.Producer
                     switch (sendResult.Status)
                     {
                         case TaskStatus.RanToCompletion:
+                        case TaskStatus.WaitingForActivation:
                             m.SentDate = DateTime.UtcNow;
                             m.Status = MessageStatus.Persisted;
                             break;
@@ -52,13 +53,12 @@ namespace Messaging.Outbox.Producer
                             m.Status = MessageStatus.NotPersisted;
                             break;
                         case TaskStatus.Created:
-                        case TaskStatus.WaitingForActivation:
                             m.Status = MessageStatus.PossiblyPersisted;
                             break;
                     }
 
                     await _messageRepository.UpdateMessage(m, cancellationToken);
-                });
+                };
                 await Task.Delay(1000, cancellationToken);
             }
         }

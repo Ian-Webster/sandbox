@@ -16,9 +16,8 @@ namespace Messaging.Outbox.Data.Repositories
 
         public async Task<IEnumerable<Message>> GetUnSentMessages(CancellationToken token)
         {
-            var unsentStatuses = new List<MessageStatus> { MessageStatus.NotPersisted, MessageStatus.PossiblyPersisted };
             return await _messageRepo.DbSet
-                .Where(x => unsentStatuses.Contains(x.Status))
+                .Where(x => x.Status == MessageStatus.Saved)
                 .Take(50)
                 .ToListAsync(token);
         }
@@ -30,11 +29,6 @@ namespace Messaging.Outbox.Data.Repositories
 
         public Task<bool> UpdateMessage(Message message, CancellationToken token)
         {
-            //_messageRepo.DbSet.Attach(message);
-
-            message.Status = message.Status;
-            message.SentDate = message.SentDate;
-            message.Error = message.Error;
             return _messageRepo.Update(message, token);
         }
     }

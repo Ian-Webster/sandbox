@@ -1,14 +1,7 @@
-﻿using Confluent.Kafka;
-using DataAccess.Repository;
-using Messaging.Outbox.Data;
-using Messaging.Outbox.Data.Entities;
+﻿using Messaging.Outbox.Data.Entities;
 using Messaging.Outbox.Data.Enums;
 using Messaging.Outbox.Data.Repositories;
 using Messaging.Outbox.Domain.Messages;
-using Messaing.Shared.Business.Models;
-using Messaing.Shared.Business.Producer;
-using Messaing.Shared.Business.Serialisers;
-using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
 using System.Text.Json;
 
@@ -16,39 +9,11 @@ namespace Messaging.Outbox.Producer
 {
     public class MessageSender
     {
-        private readonly MessageRepository _messageRepo;
-        private readonly IKafkaProducer<OutboxMessageBase> producer;
-        private readonly ByteArraySerialiser<OutboxMessageBase> _serialiser;
+        private readonly IMessageRepository _messageRepo;
 
-        public MessageSender()
+        public MessageSender(IMessageRepository messageRepository)
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDbContext<OutboxContent>(
-                // this should work for API projects but won't work here because we aren't really using DI
-                /*options => options.UseNpgsql("Host=localhost:5432;Username=postgres;Password=postgres;Database=outbox")
-                .UseSnakeCaseNamingConvention()*/
-            );
-
-            serviceCollection.AddScoped<RepositoryFactory<OutboxContent>>();
-            serviceCollection.AddHostedService<KafkaProducerService>();
-
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var repositoryFactory = serviceProvider.GetService<RepositoryFactory<OutboxContent>>();
-            _messageRepo = new MessageRepository(repositoryFactory);
-
-            producer = new KafkaProducer<OutboxMessageBase>(
-                new ProducerConfiguration
-                {
-                    KafkaHost = "localhost:9092",
-                    ProducerGroupName = "OutboxProducer",
-                    MessageTimeout = 10000
-                }
-            );
-
-            var hostedService = serviceProvider.GetService<KafkaProducerService>();
-            _ = hostedService.StartAsync(new CancellationToken());
-
-            _serialiser = new ByteArraySerialiser<OutboxMessageBase>();
+            _messageRepo = messageRepository;
         }
 
         public async Task RenderMainMenu()
@@ -126,16 +91,16 @@ namespace Messaging.Outbox.Producer
                 var messageData = CreateMessage(messageType);
 
                 if (await _messageRepo.AddMessage(new Message
-                {
-                    MessageId = Guid.NewGuid(),
-                    Topic = messageData.topicName,
-                    MessageContent = JsonSerializer.SerializeToUtf8Bytes(messageData),
-                    CreatedDate = DateTime.UtcNow,
-                    Status = MessageStatus.Saved
-                }, new CancellationToken()))
+                    {
+                        MessageId = Guid.NewGuid(),
+                        Topic = messageData.topicName,
+                        MessageContent = JsonSerializer.SerializeToUtf8Bytes(messageData),
+                        CreatedDate = DateTime.UtcNow,
+                        Status = MessageStatus.Saved
+                    }, new CancellationToken()))
                 {
                     AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i + 1} of {numberToSend}[/]");
-                    return true;
+                    continue;
                 }
 
                 AnsiConsole.MarkupLine($"[bold red]Failed to generate message {i + 1}[/]");
