@@ -6,6 +6,8 @@ namespace Messaging.Outbox.Data.Entities
     {
         public Guid MessageId { get; set; }
 
+        public string Topic { get; set; }
+
         public byte[] MessageContent { get; set; }
 
         public DateTime CreatedDate { get; set; }

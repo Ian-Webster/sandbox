@@ -1,6 +1,5 @@
 ﻿using Messaging.Outbox.Data.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Messaging.Outbox.Data
 {
@@ -21,7 +20,6 @@ namespace Messaging.Outbox.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OutboxContent).Assembly);
-
         }
 
     }

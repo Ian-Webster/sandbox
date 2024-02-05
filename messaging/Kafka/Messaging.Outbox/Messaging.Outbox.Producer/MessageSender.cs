@@ -30,9 +30,9 @@ namespace Messaging.Outbox.Producer
             );
 
             serviceCollection.AddScoped<RepositoryFactory<OutboxContent>>();
+            serviceCollection.AddHostedService<KafkaProducerService>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            //var dbContext = serviceProvider.GetService<OutboxContent>();
             var repositoryFactory = serviceProvider.GetService<RepositoryFactory<OutboxContent>>();
             _messageRepo = new MessageRepository(repositoryFactory);
 
@@ -44,6 +44,9 @@ namespace Messaging.Outbox.Producer
                     MessageTimeout = 10000
                 }
             );
+
+            var hostedService = serviceProvider.GetService<KafkaProducerService>();
+            _ = hostedService.StartAsync(new CancellationToken());
 
             _serialiser = new ByteArraySerialiser<OutboxMessageBase>();
         }
@@ -110,9 +113,9 @@ namespace Messaging.Outbox.Producer
 
             AnsiConsole.MarkupLine($"If you want to send more messages press space otherwise press any other key to exit");
 
-            var key = System.Console.ReadKey();
+            var key = Console.ReadKey();
 
-            if (key.Key == System.ConsoleKey.Spacebar)
+            if (key.Key == ConsoleKey.Spacebar)
                 await RenderMainMenu();
         }
 
@@ -122,23 +125,29 @@ namespace Messaging.Outbox.Producer
             {
                 var messageData = CreateMessage(messageType);
 
-                await _messageRepo.AddMessage(new Message
+                if (await _messageRepo.AddMessage(new Message
                 {
                     MessageId = Guid.NewGuid(),
+                    Topic = messageData.topicName,
                     MessageContent = JsonSerializer.SerializeToUtf8Bytes(messageData),
                     CreatedDate = DateTime.UtcNow,
                     Status = MessageStatus.Saved
-                }, new CancellationToken()); ;
+                }, new CancellationToken()))
+                {
+                    AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i + 1} of {numberToSend}[/]");
+                    return true;
+                }
 
-                AnsiConsole.MarkupLine($"[bold green]Generated message {messageData.message} {i + 1} of {numberToSend}[/]");
+                AnsiConsole.MarkupLine($"[bold red]Failed to generate message {i + 1}[/]");
+                return false;
 
-                var result = await producer.SendMessage(messageData.topicName, messageData.message, new System.Threading.CancellationToken());
+                /*var result = await producer.SendMessage(messageData.topicName, messageData.message, new System.Threading.CancellationToken());
                 if (result.Status != PersistenceStatus.Persisted)
                 {
                     // Handle failed message send
                     AnsiConsole.MarkupLine($"[bold red]Failed to send message {i + 1}[/]");
                     return false;
-                }
+                }*/
             }
             return true;
         }

@@ -11,6 +11,7 @@
 -- comment: create message table
 CREATE TABLE public.message (
     message_id uuid NOT NULL,
+	topic varchar(250) NOT NULL,
     message_content bytea NOT NULL,
     created_date timestamp with time zone NOT NULL,
     sent_date timestamp with time zone,
