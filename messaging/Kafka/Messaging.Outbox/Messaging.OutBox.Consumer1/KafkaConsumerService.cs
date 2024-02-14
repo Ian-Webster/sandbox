@@ -4,10 +4,11 @@ using Messaing.Shared.Business.Consumer;
 using Messaing.Shared.Business.Models;
 using Microsoft.Extensions.Hosting;
 using Spectre.Console;
+using System.Threading;
 
 namespace Messaging.OutBox.Consumer1
 {
-    public class KafkaConsumerService : IHostedService
+    public class KafkaConsumerService : BackgroundService
     {
         private KafkaConsumer<OutboxMessageBase> _consumer;
 
@@ -28,24 +29,20 @@ namespace Messaging.OutBox.Consumer1
                 new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" });
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                AnsiConsole.MarkupLine($"[bold purple]Testing {DateTime.UtcNow.ToLongTimeString()}[/]");
-                var message = _consumer.ConsumeMessage();
-                if (message != null && !message.IsPartitionEOF)
+                var message = _consumer.ConsumeMessage(stoppingToken);
+                if (message is { IsPartitionEOF: false })
                 {
-                    AnsiConsole.MarkupLine($"[bold purple]Message received {message.Message.Value.MessageId}-{message.Offset}-{message.Message.Value.Message}[/]");
+                    AnsiConsole.MarkupLine(
+                        $"[bold purple]Message received {message.Message.Value.MessageId}-{message.Offset}-{message.Message.Value.Message}[/]");
                     _consumer.CommitMessage(message);
                 }
-                await Task.Delay(200, cancellationToken);
-            }
-        }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
+                await Task.Delay(200, stoppingToken);
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ var host = new HostBuilder()
         .ConfigureHostConfiguration(configHost => {
         })
         .ConfigureServices((hostContext, services) => {
-            services.AddScoped<RepositoryFactory<OutboxContent>>();
+            services.AddScoped<UnitOfWork<OutboxContent>>();
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<MessageSender>();
             services.AddHostedService<KafkaProducerService>();

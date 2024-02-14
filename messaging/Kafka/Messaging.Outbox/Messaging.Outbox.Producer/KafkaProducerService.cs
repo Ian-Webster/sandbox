@@ -3,6 +3,7 @@ using Messaging.Outbox.Data.Repositories;
 using Messaging.Outbox.Domain.Messages;
 using Messaing.Shared.Business.Models;
 using Messaing.Shared.Business.Producer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 
@@ -10,10 +11,10 @@ namespace Messaging.Outbox.Producer
 {
     public class KafkaProducerService : IHostedService
     {
-        private readonly IMessageRepository _messageRepository;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private KafkaProducer<OutboxMessageBase> _producer;
 
-        public KafkaProducerService(IMessageRepository messageRepository)
+        public KafkaProducerService(IServiceScopeFactory serviceScopeFactory)
         {
             _producer = new KafkaProducer<OutboxMessageBase>(
                 new ProducerConfiguration
@@ -22,14 +23,17 @@ namespace Messaging.Outbox.Producer
                     ProducerGroupName = "OutboxProducer"
                 }
             );
-            _messageRepository = messageRepository;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                var unsentMessages = await _messageRepository.GetUnSentMessages(cancellationToken);
+                using var scope = _serviceScopeFactory.CreateScope();
+                var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                var unsentMessages = await messageRepository.GetUnSentMessages(cancellationToken);
                 if (!unsentMessages.Any()) 
                 {
                     await Task.Delay(1000, cancellationToken);
@@ -57,7 +61,7 @@ namespace Messaging.Outbox.Producer
                             break;
                     }
 
-                    await _messageRepository.UpdateMessage(m, cancellationToken);
+                    await messageRepository.UpdateMessage(m, cancellationToken);
                 };
                 await Task.Delay(1000, cancellationToken);
             }

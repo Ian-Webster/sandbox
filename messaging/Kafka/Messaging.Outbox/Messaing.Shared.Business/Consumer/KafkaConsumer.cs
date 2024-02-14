@@ -39,9 +39,9 @@ namespace Messaing.Shared.Business.Consumer
             _consumer.Subscribe(topicNames);
         }
 
-        public ConsumeResult<string, TMessage> ConsumeMessage()
+        public ConsumeResult<string, TMessage>? ConsumeMessage(CancellationToken token)
         {
-            return _consumer.Consume();
+            return _consumer.Consume(token);
         }
 
         public void CommitMessage(ConsumeResult<string, TMessage> message)

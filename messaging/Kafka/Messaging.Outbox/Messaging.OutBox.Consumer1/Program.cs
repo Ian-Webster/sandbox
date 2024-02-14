@@ -8,6 +8,7 @@ var host = new HostBuilder()
         })
         .ConfigureServices((hostContext, services) => {
             services.AddHostedService<KafkaConsumerService>();
+            services.AddHostedService<ClockTickService>();
         })
         .UseConsoleLifetime()
         .Build();

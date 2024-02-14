@@ -105,14 +105,6 @@ namespace Messaging.Outbox.Producer
 
                 AnsiConsole.MarkupLine($"[bold red]Failed to generate message {i + 1}[/]");
                 return false;
-
-                /*var result = await producer.SendMessage(messageData.topicName, messageData.message, new System.Threading.CancellationToken());
-                if (result.Status != PersistenceStatus.Persisted)
-                {
-                    // Handle failed message send
-                    AnsiConsole.MarkupLine($"[bold red]Failed to send message {i + 1}[/]");
-                    return false;
-                }*/
             }
             return true;
         }

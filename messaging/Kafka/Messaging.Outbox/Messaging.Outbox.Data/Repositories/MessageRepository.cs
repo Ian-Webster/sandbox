@@ -9,9 +9,9 @@ namespace Messaging.Outbox.Data.Repositories
     {
         private readonly IRepository<Message> _messageRepo;
 
-        public MessageRepository(RepositoryFactory<OutboxContent> repositoryFactory)
+        public MessageRepository(UnitOfWork<OutboxContent> unitOfWork)
         {
-            _messageRepo = repositoryFactory.GetRepositoryByType<Message>();
+            _messageRepo = unitOfWork.Repository<Message>();
         }
 
         public async Task<IEnumerable<Message>> GetUnSentMessages(CancellationToken token)

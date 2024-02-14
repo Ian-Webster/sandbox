@@ -31,7 +31,7 @@ namespace Messaing.Shared.Business.Consumer
         /// Consumes a message from Kafka
         /// </summary>
         /// <returns></returns>
-        ConsumeResult<string, TMessage> ConsumeMessage();
+        ConsumeResult<string, TMessage>? ConsumeMessage(CancellationToken token);
 
         /// <summary>
         /// Commits a message to Kafka
