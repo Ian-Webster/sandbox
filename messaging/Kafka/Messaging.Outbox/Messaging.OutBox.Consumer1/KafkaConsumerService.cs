@@ -4,7 +4,6 @@ using Messaing.Shared.Business.Consumer;
 using Messaing.Shared.Business.Models;
 using Microsoft.Extensions.Hosting;
 using Spectre.Console;
-using System.Threading;
 
 namespace Messaging.OutBox.Consumer1
 {
@@ -23,16 +22,19 @@ namespace Messaging.OutBox.Consumer1
                     SessionTimeout = 6000
                 }
             );
-
-            // _consumer.SubscribeToTopic("outbox");
-            _consumer.SubscribeToTopics(
-                new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" });
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                if (!_consumer.Subscribed && !_consumer.SubscribeToTopics(
+                        new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" }))
+                {
+                    // Kafka is down, wait for 30 seconds and try again on the next loop
+                    AnsiConsole.MarkupLine("[bold red]Kafka is down, waiting 30 seconds and trying again[/]");
+                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                }
                 var message = _consumer.ConsumeMessage(stoppingToken);
                 if (message is { IsPartitionEOF: false })
                 {

@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Messaing.Shared.Business.Models;
 
-namespace Messaing.Shared.Business.Producer
+namespace Messaging.Shared.Business.Producer
 {
     /// <summary>
     /// Provides a mechanism for sending messages to Kafka
@@ -9,6 +9,11 @@ namespace Messaing.Shared.Business.Producer
     /// <typeparam name="TMessage">The type of message to send</typeparam>
     public interface IKafkaProducer<TMessage> where TMessage : MessageBase
     {
+        /// <summary>
+        /// Indicates whether the producer is faulted or not
+        /// </summary>
+        public bool IsFaulted { get; set; }
+
         /// <summary>
         /// Sends a message to Kafka
         /// </summary>
@@ -18,6 +23,15 @@ namespace Messaing.Shared.Business.Producer
         /// <returns>
         /// Returns the message with some of the IMessage properties populated
         /// </returns>
-        Task<DeliveryResult<string, TMessage>> SendMessage(string topicName, TMessage message, CancellationToken token);
+        Task<DeliveryResult<string, TMessage>?> SendMessage(string topicName, TMessage message, CancellationToken token);
+
+        /// <summary>
+        /// Checks if the Kafka cluster is up
+        /// </summary>
+        /// <remarks>
+        /// Also sets "IsFaulted" to false if the cluster is up
+        /// </remarks>
+        /// <returns></returns>
+        Task<bool> KafkaIsUp();
     }
 }

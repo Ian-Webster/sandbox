@@ -21,32 +21,71 @@ namespace Messaing.Shared.Business.Consumer
                     SessionTimeoutMs = consumerConfiguration.SessionTimeout
                 })
                 .SetValueDeserializer(new ByteArraySerialiser<TMessage>())
+                .SetErrorHandler((_, e) => { Subscribed = false; })
                 .Build();
         }
 
-        public void SubscribeToTopic(string topicName)
+        public bool Subscribed { get; set; }
+
+        public bool SubscribeToTopic(string topicName)
         {
-            _consumer.Subscribe(topicName);  
+            try
+            {
+                _consumer.Subscribe(topicName);
+                Subscribed = true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // log the exception
+                return false;
+            } 
         }
 
-        public void SubscribeToTopics(ICollection<string> topicNames)
+        public bool SubscribeToTopics(ICollection<string> topicNames)
         {
             if (topicNames == null || topicNames.Count == 0)
             {
                 throw new ArgumentException("No topics provided", nameof(topicNames));
             }
 
-            _consumer.Subscribe(topicNames);
+            try
+            {
+                _consumer.Subscribe(topicNames);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // log the exception
+                return false;
+            }
         }
 
         public ConsumeResult<string, TMessage>? ConsumeMessage(CancellationToken token)
         {
-            return _consumer.Consume(token);
+            try
+            {
+                return _consumer.Consume(token);
+            }
+            catch (Exception ex)
+            {
+                // log the exception
+                return null;
+            }
         }
 
-        public void CommitMessage(ConsumeResult<string, TMessage> message)
+        public bool CommitMessage(ConsumeResult<string, TMessage> message)
         {
-            _consumer.Commit(message);
+            try
+            {
+                _consumer.Commit(message);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // log the exception
+                return false;
+            }
         }
 
         public void Dispose()

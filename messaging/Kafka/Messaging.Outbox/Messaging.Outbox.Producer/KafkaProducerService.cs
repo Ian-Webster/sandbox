@@ -2,10 +2,11 @@
 using Messaging.Outbox.Data.Repositories;
 using Messaging.Outbox.Domain.Messages;
 using Messaing.Shared.Business.Models;
-using Messaing.Shared.Business.Producer;
+using Messaging.Shared.Business.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
+using Spectre.Console;
 
 namespace Messaging.Outbox.Producer
 {
@@ -31,6 +32,20 @@ namespace Messaging.Outbox.Producer
 
             while (!cancellationToken.IsCancellationRequested)
             {
+                if (_producer.IsFaulted)
+                {
+                    AnsiConsole.MarkupLine("[bold red]Kafka is down, waiting 30 seconds and trying again[/]");
+                    if (!await _producer.KafkaIsUp())
+                    {
+                        // wait 30 seconds for the broker to be available
+                        // if it's still not available, try again on the next loops
+                        await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                        continue;
+                    }
+                    // kafka must be up if we hit this point
+                    
+                }
+
                 using var scope = _serviceScopeFactory.CreateScope();
                 var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                 var unsentMessages = await messageRepository.GetUnSentMessages(cancellationToken);
@@ -43,7 +58,19 @@ namespace Messaging.Outbox.Producer
                 foreach (var m in unsentMessages)
                 {
                     var hydratedMessage = JsonSerializer.Deserialize<OutboxMessageBase>(m.MessageContent);
+
                     var sendResult = _producer.SendMessage(m.Topic, hydratedMessage, cancellationToken);
+
+                    if (sendResult == null)
+                    {
+                        m.Status = MessageStatus.NotSet;
+                        m.Error = "Failed to send message to Kafka";
+                        await messageRepository.UpdateMessage(m, cancellationToken);
+                        AnsiConsole.MarkupLine($"[bold red]Kafka is down, waiting 30 seconds to retry[/]");
+                        // wait 30 seconds for the broker to be available
+                        await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                        continue;
+                    }
 
                     switch (sendResult.Status)
                     {
@@ -62,6 +89,7 @@ namespace Messaging.Outbox.Producer
                     }
 
                     await messageRepository.UpdateMessage(m, cancellationToken);
+                    
                 };
                 await Task.Delay(1000, cancellationToken);
             }

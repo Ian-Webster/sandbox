@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Messaging.Outbox.Business\Messaging.Outbox.Business.csproj" />
     <ProjectReference Include="..\Messaging.Outbox.Domain\Messaging.Outbox.Domain.csproj" />
-    <ProjectReference Include="..\Messaing.Shared.Business\Messaing.Shared.Business.csproj" />
+    <ProjectReference Include="..\Messaing.Shared.Business\Messaging.Shared.Business.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,13 +10,18 @@ namespace Messaing.Shared.Business.Consumer
     public interface IKafkaConsumer<TMessage> where TMessage : MessageBase
     {
         /// <summary>
+        /// Indicates whether a consumer is subscribed to a topic/s or not
+        /// </summary>
+        public bool Subscribed { get; set; }
+
+        /// <summary>
         /// subscribes to a topic
         /// </summary>
         /// <remarks>
         /// You'll need to call this or <see cref="SubscribeToTopics"/> before calling <see cref="ConsumeMessage"/> 
         /// </remarks>
         /// <param name="topicName"></param>
-        void SubscribeToTopic(string topicName);
+        bool SubscribeToTopic(string topicName);
 
         /// <summary>
         /// subscribes to a collection of topics
@@ -25,7 +30,7 @@ namespace Messaing.Shared.Business.Consumer
         /// You'll need to call this or <see cref="SubscribeToTopic"/> before calling <see cref="ConsumeMessage"/>
         /// </remarks>
         /// <param name="topicNames"></param>
-        void SubscribeToTopics(ICollection<string> topicNames);
+        bool SubscribeToTopics(ICollection<string> topicNames);
 
         /// <summary>
         /// Consumes a message from Kafka
@@ -37,6 +42,6 @@ namespace Messaing.Shared.Business.Consumer
         /// Commits a message to Kafka
         /// </summary>
         /// <param name="message"></param>
-        void CommitMessage(ConsumeResult<string, TMessage> message);
+        bool CommitMessage(ConsumeResult<string, TMessage> message);
     }
 }

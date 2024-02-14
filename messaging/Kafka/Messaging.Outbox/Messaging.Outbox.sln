@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Outbox.Producer", "Messaging.Outbox.Producer\Messaging.Outbox.Producer.csproj", "{04AEFA74-E85B-494D-8B28-15A5E9550D40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaing.Shared.Business", "Messaing.Shared.Business\Messaing.Shared.Business.csproj", "{C8F35BAC-CDCD-48C9-91E6-861F5ED0CCA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Shared.Business", "Messaing.Shared.Business\Messaging.Shared.Business.csproj", "{C8F35BAC-CDCD-48C9-91E6-861F5ED0CCA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{DDB361DD-2DFF-4567-856E-23DF0E004E94}"
 EndProject
@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Outbox.Domain", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.OutBox.Consumer1", "Messaging.OutBox.Consumer1\Messaging.OutBox.Consumer1.csproj", "{B058E9A3-04A1-41D4-82D2-69E9D4A2DCF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Outbox.Data", "Messaging.Outbox.Data\Messaging.Outbox.Data.csproj", "{03BEBF65-251A-420C-840A-699BE95836DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Outbox.Data", "Messaging.Outbox.Data\Messaging.Outbox.Data.csproj", "{03BEBF65-251A-420C-840A-699BE95836DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
