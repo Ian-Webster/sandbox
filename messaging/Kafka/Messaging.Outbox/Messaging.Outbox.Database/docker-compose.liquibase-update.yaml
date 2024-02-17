@@ -1,0 +1,15 @@
+version: "3.1"
+
+services:
+  sandbox-liquibase:
+    container_name: outbox-liquibase
+    image: liquibase/liquibase
+    command: --defaultsFile=liquibase.properties update
+    volumes:
+      - ./config/changelog.xml:/liquibase/changelog.xml
+      - ./scripts:/liquibase/scripts
+      - ./config/liquibase.properties:/liquibase/liquibase.properties
+    networks:
+      - outbox-database-net
+networks:
+  outbox-database-net:
