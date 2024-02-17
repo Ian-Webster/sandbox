@@ -12,7 +12,11 @@ namespace Messaging.Shared.Business.Producer
         /// <summary>
         /// Indicates whether the producer is faulted or not
         /// </summary>
-        public bool IsFaulted { get; set; }
+        /// <remarks>
+        /// This will be set automatically internally by the KafkaProducer class
+        /// In the event of an error, this will be true
+        /// </remarks>
+        public bool IsFaulted { get; }
 
         /// <summary>
         /// Sends a message to Kafka
@@ -23,7 +27,7 @@ namespace Messaging.Shared.Business.Producer
         /// <returns>
         /// Returns the message with some of the IMessage properties populated
         /// </returns>
-        Task<DeliveryResult<string, TMessage>?> SendMessage(string topicName, TMessage message, CancellationToken token);
+        Task<DeliveryResult<string, TMessage>> SendMessage(string topicName, TMessage message, CancellationToken token);
 
         /// <summary>
         /// Checks if the Kafka cluster is up

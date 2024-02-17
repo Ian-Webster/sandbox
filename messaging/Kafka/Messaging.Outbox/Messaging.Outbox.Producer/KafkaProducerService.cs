@@ -6,6 +6,7 @@ using Messaging.Shared.Business.Producer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace Messaging.Outbox.Producer
@@ -13,18 +14,21 @@ namespace Messaging.Outbox.Producer
     public class KafkaProducerService : IHostedService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private KafkaProducer<OutboxMessageBase> _producer;
+        private readonly KafkaProducer<OutboxMessageBase> _producer;
 
         public KafkaProducerService(IServiceScopeFactory serviceScopeFactory)
         {
+            _serviceScopeFactory = serviceScopeFactory;
+            var logger = _serviceScopeFactory.CreateScope().ServiceProvider
+                .GetRequiredService<ILogger<KafkaProducer<OutboxMessageBase>>>();
             _producer = new KafkaProducer<OutboxMessageBase>(
                 new ProducerConfiguration
                 {
                     KafkaHost = "localhost:9092",
                     ProducerGroupName = "OutboxProducer"
-                }
+                },
+                logger
             );
-            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
