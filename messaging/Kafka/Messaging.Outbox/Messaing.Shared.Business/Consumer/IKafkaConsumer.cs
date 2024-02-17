@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Messaing.Shared.Business.Models;
 
-namespace Messaing.Shared.Business.Consumer
+namespace Messaging.Shared.Business.Consumer
 {
     /// <summary>
     /// Provides a mechanism for consuming messages from Kafka
@@ -10,9 +10,18 @@ namespace Messaing.Shared.Business.Consumer
     public interface IKafkaConsumer<TMessage> where TMessage : MessageBase
     {
         /// <summary>
-        /// Indicates whether a consumer is subscribed to a topic/s or not
+        /// Indicates whether the producer is faulted or not
         /// </summary>
-        public bool Subscribed { get; set; }
+        /// <remarks>
+        /// This will be set automatically internally by the KafkaSubscriber class
+        /// In the event of an error, this will be true
+        /// </remarks>
+        public bool IsFaulted { get; }
+
+        /// <summary>
+        /// Indicates whether the consumer is subscribed to a topic or not
+        /// </summary>
+        public bool IsSubscribed { get; }
 
         /// <summary>
         /// subscribes to a topic
@@ -36,12 +45,21 @@ namespace Messaing.Shared.Business.Consumer
         /// Consumes a message from Kafka
         /// </summary>
         /// <returns></returns>
-        ConsumeResult<string, TMessage>? ConsumeMessage(CancellationToken token);
+        ConsumeResult<string, TMessage>? ConsumeMessage();
 
         /// <summary>
         /// Commits a message to Kafka
         /// </summary>
         /// <param name="message"></param>
         bool CommitMessage(ConsumeResult<string, TMessage> message);
+
+        /// <summary>
+        /// Checks if the Kafka cluster is up
+        /// </summary>
+        /// <remarks>
+        /// Also sets "IsFaulted" to false if the cluster is up
+        /// </remarks>
+        /// <returns></returns>
+        Task<bool> KafkaIsUp();
     }
 }

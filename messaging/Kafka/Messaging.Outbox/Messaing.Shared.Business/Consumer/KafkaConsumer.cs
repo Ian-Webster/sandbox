@@ -1,43 +1,59 @@
 ﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Messaing.Shared.Business.Models;
 using Messaing.Shared.Business.Serialisers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace Messaing.Shared.Business.Consumer
+namespace Messaging.Shared.Business.Consumer
 {
     public class KafkaConsumer<TMessage> : IKafkaConsumer<TMessage>, IDisposable where TMessage : MessageBase
     {
+        private readonly ConsumerConfiguration _config;
+        private readonly ILogger<IKafkaConsumer<TMessage>> _logger;
         private IConsumer<string, TMessage> _consumer;
+        private readonly IAdminClient _adminClient;
 
-        public KafkaConsumer(ConsumerConfiguration consumerConfiguration)
+        public KafkaConsumer(IOptions<ConsumerConfiguration> consumerConfigurationOptions, ILogger<IKafkaConsumer<TMessage>> logger)
         {
+            _config = consumerConfigurationOptions.Value;
+            _logger = logger;
             _consumer = new ConsumerBuilder<string, TMessage>(
                 new ConsumerConfig
                 {
-                    BootstrapServers = consumerConfiguration.KafkaHost,
-                    GroupId = consumerConfiguration.ConsumerGroupName,
-                    AutoOffsetReset = consumerConfiguration.AutoOffsetReset,
+                    BootstrapServers = _config.KafkaHost,
+                    GroupId = _config.ConsumerGroupName,
+                    AutoOffsetReset = _config.AutoOffsetReset,
                     EnableAutoCommit = false,
                     EnablePartitionEof = true,
-                    SessionTimeoutMs = consumerConfiguration.SessionTimeout
+                    SessionTimeoutMs = _config.SessionTimeout
                 })
                 .SetValueDeserializer(new ByteArraySerialiser<TMessage>())
-                .SetErrorHandler((_, e) => { Subscribed = false; })
+                .SetErrorHandler((_, _) => { IsFaulted = true; })
                 .Build();
+
+            // create the admin client
+            var adminConfig = new AdminClientConfig
+            {
+                BootstrapServers = _config.KafkaHost
+            };
+            _adminClient = new AdminClientBuilder(adminConfig).Build(); // we'll use the admin client to check the status of the cluster
         }
 
-        public bool Subscribed { get; set; }
+        public bool IsFaulted { get; set; }
+        public bool IsSubscribed { get; set; }
 
         public bool SubscribeToTopic(string topicName)
         {
             try
             {
                 _consumer.Subscribe(topicName);
-                Subscribed = true;
+                IsSubscribed = true;
                 return true;
             }
             catch (Exception ex)
             {
-                // log the exception
+                _logger.LogError(ex, "Failed to subscribe to topic {topicName}", topicName);
                 return false;
             } 
         }
@@ -56,20 +72,20 @@ namespace Messaing.Shared.Business.Consumer
             }
             catch (Exception ex)
             {
-                // log the exception
+                _logger.LogError(ex, "Failed to subscribe to topics {topicNames}", string.Join(",", topicNames));
                 return false;
             }
         }
 
-        public ConsumeResult<string, TMessage>? ConsumeMessage(CancellationToken token)
+        public ConsumeResult<string, TMessage>? ConsumeMessage()
         {
             try
             {
-                return _consumer.Consume(token);
+                return _consumer.Consume(TimeSpan.FromSeconds(5));
             }
             catch (Exception ex)
             {
-                // log the exception
+                _logger.LogError(ex, "Failed to consume message from Kafka");
                 return null;
             }
         }
@@ -83,7 +99,24 @@ namespace Messaing.Shared.Business.Consumer
             }
             catch (Exception ex)
             {
-                // log the exception
+                _logger.LogError(ex, "Failed to commit message to Kafka");
+                return false;
+            }
+        }
+
+        public async Task<bool> KafkaIsUp()
+        {
+            try
+            {
+                await _adminClient.DescribeClusterAsync(new DescribeClusterOptions
+                {
+                    RequestTimeout = TimeSpan.FromSeconds(5) // we'll wait 5 seconds for the cluster to respond
+                });
+                IsFaulted = false;
+                return true;
+            }
+            catch
+            {
                 return false;
             }
         }

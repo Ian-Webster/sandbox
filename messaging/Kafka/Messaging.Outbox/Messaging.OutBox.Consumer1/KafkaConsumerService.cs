@@ -1,26 +1,28 @@
 ﻿using Confluent.Kafka;
 using Messaging.Outbox.Domain.Messages;
-using Messaing.Shared.Business.Consumer;
+using Messaging.Shared.Business.Consumer;
 using Messaing.Shared.Business.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Spectre.Console;
 
 namespace Messaging.OutBox.Consumer1
 {
     public class KafkaConsumerService : BackgroundService
     {
-        private KafkaConsumer<OutboxMessageBase> _consumer;
+        private readonly KafkaConsumer<OutboxMessageBase> _consumer;
 
-        public KafkaConsumerService()
+        public KafkaConsumerService(IServiceScopeFactory serviceScope)
         {
+            var scope = serviceScope.CreateScope();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<KafkaConsumer<OutboxMessageBase>>>();
+            var config = scope.ServiceProvider.GetRequiredService<IOptions<ConsumerConfiguration>>();
+
             _consumer = new KafkaConsumer<OutboxMessageBase>(
-                new ConsumerConfiguration
-                {
-                    KafkaHost = "localhost:9092",
-                    ConsumerGroupName = "OutboxConsumer1",
-                    AutoOffsetReset = AutoOffsetReset.Earliest,
-                    SessionTimeout = 6000
-                }
+                config,
+                logger
             );
         }
 
@@ -28,14 +30,22 @@ namespace Messaging.OutBox.Consumer1
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (!_consumer.Subscribed && !_consumer.SubscribeToTopics(
-                        new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" }))
+                if (_consumer.IsFaulted)
                 {
-                    // Kafka is down, wait for 30 seconds and try again on the next loop
                     AnsiConsole.MarkupLine("[bold red]Kafka is down, waiting 30 seconds and trying again[/]");
-                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                    if (!await _consumer.KafkaIsUp())
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                        continue;
+                    }
                 }
-                var message = _consumer.ConsumeMessage(stoppingToken);
+
+                if (!_consumer.IsSubscribed)
+                {
+                    _consumer.SubscribeToTopics(new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" });
+                }
+
+                var message = _consumer.ConsumeMessage();
                 if (message is { IsPartitionEOF: false })
                 {
                     AnsiConsole.MarkupLine(

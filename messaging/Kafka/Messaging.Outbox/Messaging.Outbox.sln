@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.OutBox.Consumer1"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Outbox.Data", "Messaging.Outbox.Data\Messaging.Outbox.Data.csproj", "{03BEBF65-251A-420C-840A-699BE95836DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messaging.Outbox.Consumer2", "Messaging.Outbox.Consumer2\Messaging.Outbox.Consumer2.csproj", "{77DD2695-4433-499B-B4D1-70D17BF84135}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{03BEBF65-251A-420C-840A-699BE95836DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03BEBF65-251A-420C-840A-699BE95836DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03BEBF65-251A-420C-840A-699BE95836DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77DD2695-4433-499B-B4D1-70D17BF84135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77DD2695-4433-499B-B4D1-70D17BF84135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77DD2695-4433-499B-B4D1-70D17BF84135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77DD2695-4433-499B-B4D1-70D17BF84135}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

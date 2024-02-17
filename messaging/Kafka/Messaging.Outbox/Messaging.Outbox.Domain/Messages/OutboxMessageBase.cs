@@ -1,5 +1,4 @@
-﻿using Confluent.Kafka;
-using Messaing.Shared.Business.Models;
+﻿using Messaing.Shared.Business.Models;
 
 namespace Messaging.Outbox.Domain.Messages
 {

@@ -62,7 +62,7 @@ namespace Messaging.Shared.Business.Producer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send message to Kafka with unknown Exception");
+                _logger.LogError(ex, "Failed to send message to Kafka with Exception");
                 return new DeliveryReport<string, TMessage>
                 {
                     Status = PersistenceStatus.NotPersisted, 
