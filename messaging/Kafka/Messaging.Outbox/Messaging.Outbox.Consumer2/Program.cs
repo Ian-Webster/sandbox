@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Messaging.Outbox.Business.Services;
 using Messaging.Outbox.Consumer2;
 using Messaging.Outbox.Consumer2.Services;
 using Messaging.Outbox.Domain.Messages;
@@ -8,9 +9,11 @@ using Messaing.Shared.Business.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddHostedService<KafkaConsumerService>();
+builder.Services.AddHostedService<KafkaConsumerService<HelloAll>>();
+builder.Services.AddHostedService<KafkaConsumerService<HelloConsumer2>>();
 builder.Services.AddSingleton<IMessageService, MessageService>();
-builder.Services.AddSingleton<IKafkaConsumer<OutboxMessageBase>, KafkaConsumer<OutboxMessageBase>>();
+builder.Services.AddSingleton(typeof(IKafkaConsumer<>), typeof(KafkaConsumer <>));
+builder.Services.AddSingleton<ITopicNameResolver, TopicNameResolver>();
 builder.Services.Configure<ConsumerConfiguration>(options =>
 {
     options.KafkaHost = "localhost:9092";

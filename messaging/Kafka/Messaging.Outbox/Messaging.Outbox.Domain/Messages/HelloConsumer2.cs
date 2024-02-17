@@ -2,6 +2,9 @@
 {
     public class HelloConsumer2: OutboxMessageBase
     {
-        public HelloConsumer2() : base("Hello Consumer 2") { }
+        public HelloConsumer2()
+        {
+            Message = "Hello, consumer 2!";
+        }
     }
 }

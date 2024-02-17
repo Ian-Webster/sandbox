@@ -1,19 +1,23 @@
 ﻿using System.Diagnostics;
+using Messaging.Outbox.Business.Services;
 using Messaging.Outbox.Consumer2.Services;
 using Messaging.Outbox.Domain.Messages;
 using Messaging.Shared.Business.Consumer;
 
 namespace Messaging.Outbox.Consumer2;
 
-public class KafkaConsumerService: BackgroundService
+public class KafkaConsumerService<TMessage>: BackgroundService where TMessage : OutboxMessageBase
 {
-    private readonly IKafkaConsumer<OutboxMessageBase> _consumer;
+    private readonly IKafkaConsumer<TMessage> _consumer;
     private readonly IMessageService _messageService;
+    private readonly ITopicNameResolver _topicNameResolver;
 
-    public KafkaConsumerService(IKafkaConsumer<OutboxMessageBase> consumer, IMessageService messageService)
+    public KafkaConsumerService(IKafkaConsumer<TMessage> consumer, 
+        IMessageService messageService, ITopicNameResolver topicNameResolver)
     {
         _consumer = consumer;
         _messageService = messageService;
+        _topicNameResolver = topicNameResolver;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,13 +36,13 @@ public class KafkaConsumerService: BackgroundService
 
             if (!_consumer.IsSubscribed)
             {
-                _consumer.SubscribeToTopics(new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer2" });
+                _consumer.SubscribeToTopic(_topicNameResolver.GetTopicForMessageType(typeof(TMessage)));
             }
 
             var message = _consumer.ConsumeMessage();
             if (message is { IsPartitionEOF: false })
             {
-                Console.WriteLine($"Message received {message.Message.Value.MessageId}-{message.Offset}-{message.Message.Value.Message}[/]");
+                Console.WriteLine($"Message received {message.Message.Value.MessageId}-{message.Offset}-{message.Message.Value.Message}");
                 _messageService.AddMessage(message.Message.Value);
                 _consumer.CommitMessage(message);
             }

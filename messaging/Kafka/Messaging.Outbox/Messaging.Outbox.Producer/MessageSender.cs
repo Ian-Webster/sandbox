@@ -1,7 +1,9 @@
-﻿using Messaging.Outbox.Data.Entities;
+﻿using System.Text;
+using Messaging.Outbox.Data.Entities;
 using Messaging.Outbox.Data.Enums;
 using Messaging.Outbox.Data.Repositories;
 using Messaging.Outbox.Domain.Messages;
+using Newtonsoft.Json;
 using Spectre.Console;
 using System.Text.Json;
 
@@ -86,7 +88,7 @@ namespace Messaging.Outbox.Producer
 
         private async Task<bool> SendMessages(MessageTypes messageType, int numberToSend)
         {
-            for (int i = 0; i < numberToSend; i++)
+            for (var i = 0; i < numberToSend; i++)
             {
                 var messageData = CreateMessage(messageType);
 
@@ -94,7 +96,13 @@ namespace Messaging.Outbox.Producer
                     {
                         MessageId = Guid.NewGuid(),
                         Topic = messageData.topicName,
-                        MessageContent = JsonSerializer.SerializeToUtf8Bytes(messageData),
+                        // using Netwonsoft.Json because the built in serialiser doesn't support serialising the base class
+                        MessageContent = Encoding.UTF8.GetBytes(
+                            JsonConvert.SerializeObject(messageData.message, new JsonSerializerSettings
+                            {
+                                TypeNameHandling = TypeNameHandling.Auto
+                            })
+                        ),
                         CreatedDate = DateTime.UtcNow,
                         Status = MessageStatus.Saved
                     }, new CancellationToken()))

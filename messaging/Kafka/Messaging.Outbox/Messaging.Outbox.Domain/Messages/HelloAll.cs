@@ -2,8 +2,9 @@
 {
     public class HelloAll: OutboxMessageBase
     {
-        public HelloAll() : base("Hello All")
+        public HelloAll()
         {
+            Message = "Hello, all!";
         }
     }
 }

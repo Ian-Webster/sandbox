@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using Messaging.Outbox.Business.Services;
 using Messaging.Outbox.Domain.Messages;
 using Messaging.Shared.Business.Consumer;
 using Messaing.Shared.Business.Models;
@@ -10,17 +11,19 @@ using Spectre.Console;
 
 namespace Messaging.OutBox.Consumer1
 {
-    public class KafkaConsumerService : BackgroundService
+    public class KafkaConsumerService<TMessage> : BackgroundService where TMessage : OutboxMessageBase
     {
-        private readonly KafkaConsumer<OutboxMessageBase> _consumer;
+        private readonly ITopicNameResolver _topicNameResolver;
+        private readonly KafkaConsumer<TMessage> _consumer;
 
         public KafkaConsumerService(IServiceScopeFactory serviceScope)
         {
             var scope = serviceScope.CreateScope();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<KafkaConsumer<OutboxMessageBase>>>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<KafkaConsumer<TMessage>>>();
             var config = scope.ServiceProvider.GetRequiredService<IOptions<ConsumerConfiguration>>();
+            _topicNameResolver = scope.ServiceProvider.GetRequiredService<ITopicNameResolver>();
 
-            _consumer = new KafkaConsumer<OutboxMessageBase>(
+            _consumer = new KafkaConsumer<TMessage>(
                 config,
                 logger
             );
@@ -42,7 +45,7 @@ namespace Messaging.OutBox.Consumer1
 
                 if (!_consumer.IsSubscribed)
                 {
-                    _consumer.SubscribeToTopics(new List<string> { "Outbox-HelloAll", "Outbox-HelloConsumer1" });
+                    _consumer.SubscribeToTopic(_topicNameResolver.GetTopicForMessageType(typeof(TMessage)));
                 }
 
                 var message = _consumer.ConsumeMessage();

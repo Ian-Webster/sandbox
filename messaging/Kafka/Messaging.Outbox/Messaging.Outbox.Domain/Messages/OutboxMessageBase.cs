@@ -6,12 +6,6 @@ namespace Messaging.Outbox.Domain.Messages
     {
         public string Message { get; set; }
 
-        protected OutboxMessageBase(string message) 
-        {
-            Message = message;
-            Initialise();
-        }
-
         public OutboxMessageBase()
         {
             Initialise();
