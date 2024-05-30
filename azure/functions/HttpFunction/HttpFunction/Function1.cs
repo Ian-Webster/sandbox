@@ -16,11 +16,11 @@ namespace HttpFunction
 
         [Function("Function1")]
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req,
-            [BlobInput("images/2012-10-17 17.21.45.jpg")] Stream blobStream)
+            [BlobInput("images/test-image.jpg")] Stream blobStream)
         {
             return new FileStreamResult(blobStream, "image/jpeg")
             {
-                FileDownloadName = "2012-10-17 17.21.45.jpg"
+                FileDownloadName = "test-image.jpg"
             };
         }
     }

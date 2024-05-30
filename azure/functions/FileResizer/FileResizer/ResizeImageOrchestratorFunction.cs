@@ -130,7 +130,7 @@ namespace FileResizer
             var logger = executionContext.GetLogger(nameof(SaveFile));
             logger.LogInformation("saving file");
 
-            var blobServiceClient = new BlobServiceClient("AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;");
+            var blobServiceClient = new BlobServiceClient("UseDevelopmentStorage=true;");
             var containerClient = blobServiceClient.GetBlobContainerClient("resized-images");
 
             var path = $"./data/{resizedFile.FileName}";
